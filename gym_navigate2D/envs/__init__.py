@@ -1,0 +1,2 @@
+from gym_navigate2D.envs.navigate2D_env import navigate2DEnv
+from gym_navigate2D.envs.navigate2D_extrahard_env import navigate2DExtraHardEnv
