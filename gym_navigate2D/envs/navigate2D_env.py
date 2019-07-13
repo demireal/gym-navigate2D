@@ -11,32 +11,35 @@ from gym.utils import seeding
 from PIL import Image
 from matplotlib import pyplot as plt
 
-## Each state is an image. State space is 2D.
+# Each state is an image. State space is 2D.
 
-PATH_NAME = '/content/drive/My Drive/my_test_data/*.png'
-CROP_HEIGHT = 500
-CROP_WIDTH = 500
+CROP_HEIGHT = 164
+CROP_WIDTH = 250
 INPUT_SHAPE = (50, 50, 1)
-VERT_SWEEP_STATES = 50
-HOR_SWEEP_STATES = 50
+X_STATES = 21
+Y_STATES = 95
 NUM_OF_ACTIONS = 5
-STATE_ARRAY = np.zeros((INPUT_SHAPE[0], INPUT_SHAPE[1], VERT_SWEEP_STATES, HOR_SWEEP_STATES))
+STATE_ARRAY = np.zeros((INPUT_SHAPE[0], INPUT_SHAPE[1], X_STATES, Y_STATES))
 
-for index, im_path in enumerate(sorted(glob.glob(PATH_NAME))):
-    im = imageio.imread(im_path)
-    im = im[im.shape[0] - CROP_HEIGHT:im.shape[0], int(im.shape[1]/2 - CROP_WIDTH/2):int(im.shape[1]/2 + CROP_WIDTH/2), :-1]  # crop unnecessary black parts, lose alpha channel.
-    img = Image.fromarray(im)
-    img = img.resize((INPUT_SHAPE[0], INPUT_SHAPE[1])).convert('L')  # resize, convert to grey scale
-    im = np.array(img)
-    STATE_ARRAY[:, :, index] = im/255
+for x_index in range(X_STATES):
+    PATH_NAME = '/content/drive/My Drive/UBC Research/my_test_data_2D/' + str(x_index) + '/*.png'
+    for y_index, im_path in enumerate(sorted(glob.glob(PATH_NAME))):
+        im = imageio.imread(im_path)
+        im = im[im.shape[0] - CROP_HEIGHT:im.shape[0], int(im.shape[1]/2 - CROP_WIDTH/2):int(im.shape[1]/2 + CROP_WIDTH/2), :-1]  # crop unnecessary black parts, lose alpha channel.
+        img = Image.fromarray(im)
+        img = img.resize((INPUT_SHAPE[0], INPUT_SHAPE[1])).convert('L')  # resize, convert to grey scale
+        im = np.array(img)
+        STATE_ARRAY[:, :, x_index, y_index] = im/255
 
 
 class navigate2DEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
     def __init__(self):
-        self.index = random.randint(0, NUM_OF_STATES - 1)
-        self.state = STATE_ARRAY[:, :, self.index:self.index + 1]
+        self.x_index = random.randint(0, X_STATES - 1)
+        self.y_index = random.randint(0, Y_STATES - 1)
+        self.state = STATE_ARRAY[:, :, self.x_index, self.y_index, np.newaxis]
+        self.flag = False
         self.done = False
         self.nbEpisode = 1
         self.action_space = spaces.Discrete(NUM_OF_ACTIONS)
@@ -48,33 +51,55 @@ class navigate2DEnv(gym.Env):
 
     def reset(self):
         print('Episode: ' + str(self.nbEpisode))
-        self.index = random.randint(0, NUM_OF_STATES - 1)
-        self.state = STATE_ARRAY[:, :, self.index:self.index+1]
+        if self.nbEpisode < 15:
+            self.x_index = random.randint(4, 12)
+            self.y_index = random.randint(45, 69)
+        elif self.nbEpisode < 50:
+            self.x_index = random.randint(3, 13)
+            self.y_index = random.randint(40, 74)
+        elif self.nbEpisode < 100:
+            self.x_index = random.randint(2, 14)
+            self.y_index = random.randint(30, 84)
+        else:
+            self.x_index = random.randint(0, self.x_index - 1)
+            self.y_index = random.randint(0, self.y_index - 1)
+        self.state = STATE_ARRAY[:, :, x_index, y_index, np.newaxis]
+        self.flag = False
         self.done = False
         return self.state
 
     def render(self, mode='human'):
         plt.imshow(255*self.state[:, :, 0], cmap='gray', vmin=0, vmax=255)
         plt.show()
-        print('Index: ' + str(self.index))
+        print('Position: ( ' + str(self.x_index)) + ', ' + str(self.y_index) + ')'
         sleep(1)
         clear_output()
 
     def take_action(self, action):
-        if action == 0:
-            tmp_index = self.index
-        elif action == 1:
-            tmp_index = self.index + 1
-        else:
-            tmp_index = self.index - 1
+        if action == 0:  # Wait
+            tmp_x_index = self.x_index
+            tmp_y_index = self.y_index
+        elif action == 1:  # Left
+            tmp_x_index = self.x_index + 1
+            tmp_y_index = self.y_index
+        elif action == 2:  # Right
+            tmp_x_index = self.x_index - 1
+            tmp_y_index = self.y_index
+        elif action == 3:  # Up
+            tmp_x_index = self.x_index
+            tmp_y_index = self.y_index + 1
+        else:  # Down
+            tmp_x_index = self.x_index
+            tmp_y_index = self.y_index - 1
 
-        if tmp_index < 0 or tmp_index > NUM_OF_STATES - 1:
+        if tmp_x_index < 0 or tmp_x_index > X_STATES - 1 or tmp_y_index < 0 or tmp_y_index > Y_STATES - 1:
             obs = self.state
             reward = -0.1
         else:
-            self.index = tmp_index
-            self.done = 59 < self.index < 64
-            obs = STATE_ARRAY[:, :, self.index:self.index + 1]
+            self.x_index = tmp_x_index
+            self.y_index = tmp_y_index
+            self.done = 6 < self.x_index < 10 and 54 < self.y_index < 60
+            obs = STATE_ARRAY[:, :, self.x_index, self.y_index, np.newaxis]
             reward = -0.1*(1 - self.done) + 3*self.done
 
         self.nbEpisode = self.nbEpisode + 1*self.done
