@@ -11,15 +11,16 @@ from gym.utils import seeding
 from PIL import Image
 from matplotlib import pyplot as plt
 
-## Each state is an image. State space is 1D.
+## Each state is an image. State space is 2D.
 
 PATH_NAME = '/content/drive/My Drive/my_test_data/*.png'
 CROP_HEIGHT = 500
 CROP_WIDTH = 500
 INPUT_SHAPE = (50, 50, 1)
-NUM_OF_STATES = 103
-NUM_OF_ACTIONS = 3
-STATE_ARRAY = np.zeros((INPUT_SHAPE[0], INPUT_SHAPE[1], NUM_OF_STATES))
+VERT_SWEEP_STATES = 50
+HOR_SWEEP_STATES = 50
+NUM_OF_ACTIONS = 5
+STATE_ARRAY = np.zeros((INPUT_SHAPE[0], INPUT_SHAPE[1], VERT_SWEEP_STATES, HOR_SWEEP_STATES))
 
 for index, im_path in enumerate(sorted(glob.glob(PATH_NAME))):
     im = imageio.imread(im_path)
