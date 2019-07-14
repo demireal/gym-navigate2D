@@ -71,7 +71,7 @@ class navigate2DEnv(gym.Env):
     def render(self, mode='human'):
         plt.imshow(255*self.state[:, :, 0], cmap='gray', vmin=0, vmax=255)
         plt.show()
-        print('Position: ( ' + str(self.x_index)) + ', ' + str(self.y_index) + ')'
+        print('Position: ( ' + str(self.x_index) + ', ' + str(self.y_index) + ')'
         sleep(1)
         clear_output()
 
