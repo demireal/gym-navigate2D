@@ -87,10 +87,10 @@ class navigate2DEnv(gym.Env):
             tmp_y_index = self.y_index
         elif action == 3:  # Up
             tmp_x_index = self.x_index
-            tmp_y_index = self.y_index + 1
+            tmp_y_index = self.y_index + 4
         else:  # Down
             tmp_x_index = self.x_index
-            tmp_y_index = self.y_index - 1
+            tmp_y_index = self.y_index - 4
 
         if tmp_x_index < 0 or tmp_x_index > X_STATES - 1 or tmp_y_index < 0 or tmp_y_index > Y_STATES - 1:
             obs = self.state
@@ -98,9 +98,9 @@ class navigate2DEnv(gym.Env):
         else:
             self.x_index = tmp_x_index
             self.y_index = tmp_y_index
-            self.done = 6 < self.x_index < 10 and 54 < self.y_index < 60
+            self.done = 7 < self.x_index < 9 and 55 < self.y_index < 60
             obs = STATE_ARRAY[:, :, self.x_index, self.y_index, np.newaxis]
-            reward = -0.1*(1 - self.done) + 3*self.done
+            reward = -0.1*(1 - self.done) + self.done
 
         self.nbEpisode = self.nbEpisode + 1*self.done
 
