@@ -22,8 +22,8 @@ X_STATES = 20
 Y_STATES = 113
 NUM_OF_ACTIONS = 5
 STATE_ARRAY = np.zeros((INPUT_SHAPE[0], INPUT_SHAPE[1], X_STATES, Y_STATES))
-df=pd.read_csv('gdrive/My Drive/UBC Research/xy.csv')
-distances = df.values
+DF = pd.read_csv('gdrive/My Drive/UBC Research/xy.csv')
+DISTANCES = DF.values
 
 for x_index in range(X_STATES):
     PATH_NAME = '/content/drive/My Drive/UBC Research/my_test_data_2D/' + str(x_index) + '/*.png'
@@ -85,10 +85,10 @@ class navigate2DEnv(gym.Env):
             tmp_y_index = self.y_index
         elif action == 1:  # Left
             tmp_x_index = self.x_index + 1
-            tmp_y_index = np.argmin(np.abs(distances[self.x_index, self.y_index] - distances[tmp_x_index, :]))
+            tmp_y_index = np.argmin(np.abs(DISTANCES[self.x_index, self.y_index] - DISTANCES[tmp_x_index, :]))
         elif action == 2:  # Right
             tmp_x_index = self.x_index - 1
-            tmp_y_index = np.argmin(np.abs(distances[self.x_index, self.y_index] - distances[tmp_x_index, :]))
+            tmp_y_index = np.argmin(np.abs(DISTANCES[self.x_index, self.y_index] - DISTANCES[tmp_x_index, :]))
         elif action == 3:  # Up
             tmp_x_index = self.x_index
             tmp_y_index = self.y_index + 4
