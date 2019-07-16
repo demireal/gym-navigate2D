@@ -3,6 +3,8 @@ import imageio
 import glob
 import numpy as np
 import random
+import pandas as pd
+
 
 from time import sleep
 from IPython.display import clear_output
@@ -16,16 +18,18 @@ from matplotlib import pyplot as plt
 CROP_HEIGHT = 164
 CROP_WIDTH = 250
 INPUT_SHAPE = (50, 50, 1)
-X_STATES = 21
-Y_STATES = 95
+X_STATES = 20
+Y_STATES = 113
 NUM_OF_ACTIONS = 5
 STATE_ARRAY = np.zeros((INPUT_SHAPE[0], INPUT_SHAPE[1], X_STATES, Y_STATES))
+df=pd.read_csv('gdrive/My Drive/UBC Research/xy.csv')
+distances = df.values
 
 for x_index in range(X_STATES):
     PATH_NAME = '/content/drive/My Drive/UBC Research/my_test_data_2D/' + str(x_index) + '/*.png'
     for y_index, im_path in enumerate(sorted(glob.glob(PATH_NAME))):
         im = imageio.imread(im_path)
-        im = im[im.shape[0] - CROP_HEIGHT:im.shape[0], int(im.shape[1]/2 - CROP_WIDTH/2):int(im.shape[1]/2 + CROP_WIDTH/2), :-1]  # crop unnecessary black parts, lose alpha channel.
+        im = im[im.shape[0] - CROP_HEIGHT - 32:im.shape[0] - 32, int(im.shape[1]/2 - CROP_WIDTH/2):int(im.shape[1]/2 + CROP_WIDTH/2), :-1]  # crop unnecessary black parts, lose alpha channel.
         img = Image.fromarray(im)
         img = img.resize((INPUT_SHAPE[0], INPUT_SHAPE[1])).convert('L')  # resize, convert to grey scale
         im = np.array(img)
@@ -81,10 +85,10 @@ class navigate2DEnv(gym.Env):
             tmp_y_index = self.y_index
         elif action == 1:  # Left
             tmp_x_index = self.x_index + 1
-            tmp_y_index = self.y_index
+            tmp_y_index = np.argmin(np.abs(distances[self.x_index, self.y_index] - distances[tmp_x_index, :]))
         elif action == 2:  # Right
             tmp_x_index = self.x_index - 1
-            tmp_y_index = self.y_index
+            tmp_y_index = np.argmin(np.abs(distances[self.x_index, self.y_index] - distances[tmp_x_index, :]))
         elif action == 3:  # Up
             tmp_x_index = self.x_index
             tmp_y_index = self.y_index + 4
@@ -98,7 +102,7 @@ class navigate2DEnv(gym.Env):
         else:
             self.x_index = tmp_x_index
             self.y_index = tmp_y_index
-            self.done = 7 < self.x_index < 9 and 55 < self.y_index < 60
+            self.done = 7 < self.x_index < 9 and 55 < self.y_index < 61
             obs = STATE_ARRAY[:, :, self.x_index, self.y_index, np.newaxis]
             reward = -0.1*(1 - self.done) + self.done
 
