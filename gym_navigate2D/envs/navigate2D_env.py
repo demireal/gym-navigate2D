@@ -60,8 +60,8 @@ class navigate2DEnv(gym.Env):
 
     def reset(self):
         print('Episode: ' + str(self.nbEpisode))
-        self.x_index = random.randint(0, self.x_index - 1)
-        self.y_index = random.randint(0, self.y_index - 1)
+        self.x_index = random.randint(0, X_STATES - 1)
+        self.y_index = random.randint(0, Y_STATES - 1)
         self.state = STATE_ARRAY[:, :, self.x_index, self.y_index, np.newaxis]
         self.flag = False
         self.done = False
