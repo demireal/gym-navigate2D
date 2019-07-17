@@ -97,7 +97,8 @@ class navigate2DEnv(gym.Env):
             right_choice = np.square(self.x_index - 8) + np.square(self.y_index - 58) > np.square(tmp_x_index - 8) + np.square(tmp_y_index - 58)
             self.x_index = tmp_x_index
             self.y_index = tmp_y_index
-            self.done = 7 < self.x_index < 9 and 55 < self.y_index < 61
+            self.flag = 7 < self.x_index < 9 and 55 < self.y_index < 61
+            self.done = self.flag and action == 0
             obs = STATE_ARRAY[:, :, self.x_index, self.y_index, np.newaxis]
             reward = 0.1*(1 - self.done)*(-1 + 2*right_choice) + 10*self.done
 
