@@ -22,9 +22,14 @@ X_STATES = 20
 Y_STATES = 113
 NUM_OF_ACTIONS = 5
 STATE_ARRAY = np.zeros((INPUT_SHAPE[0], INPUT_SHAPE[1], X_STATES, Y_STATES))
+
 DF = pd.read_csv('/content/drive/My Drive/UBC Research/xy.csv')
 DISTANCES = DF.values
+for index_1, str_arr in enumerate(DISTANCES):
+  for index_2, str in enumerate(str_arr):
+     DISTANCES [index_1, index_2] = float(str.replace(',','.'))
 
+        
 for x_index in range(X_STATES):
     PATH_NAME = '/content/drive/My Drive/UBC Research/my_test_data_2D/' + str(x_index) + '/*.png'
     for y_index, im_path in enumerate(sorted(glob.glob(PATH_NAME))):
