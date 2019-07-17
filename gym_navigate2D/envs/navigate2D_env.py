@@ -60,18 +60,8 @@ class navigate2DEnv(gym.Env):
 
     def reset(self):
         print('Episode: ' + str(self.nbEpisode))
-        if self.nbEpisode < 15:
-            self.x_index = random.randint(4, 12)
-            self.y_index = random.randint(45, 69)
-        elif self.nbEpisode < 50:
-            self.x_index = random.randint(3, 13)
-            self.y_index = random.randint(40, 74)
-        elif self.nbEpisode < 100:
-            self.x_index = random.randint(2, 14)
-            self.y_index = random.randint(30, 84)
-        else:
-            self.x_index = random.randint(0, self.x_index - 1)
-            self.y_index = random.randint(0, self.y_index - 1)
+        self.x_index = random.randint(0, self.x_index - 1)
+        self.y_index = random.randint(0, self.y_index - 1)
         self.state = STATE_ARRAY[:, :, x_index, y_index, np.newaxis]
         self.flag = False
         self.done = False
