@@ -26,8 +26,8 @@ STATE_ARRAY = np.zeros((INPUT_SHAPE[0], INPUT_SHAPE[1], X_STATES, Y_STATES))
 DF = pd.read_csv('/content/drive/My Drive/UBC Research/xy.csv')
 DISTANCES = DF.values
 for index_1, str_arr in enumerate(DISTANCES):
-  for index_2, str in enumerate(str_arr):
-     DISTANCES [index_1, index_2] = float(str.replace(',','.'))
+  for index_2, strr in enumerate(str_arr):
+     DISTANCES [index_1, index_2] = float(strr.replace(',','.'))
 
         
 for x_index in range(X_STATES):
