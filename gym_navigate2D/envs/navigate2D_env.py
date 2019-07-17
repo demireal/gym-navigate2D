@@ -91,14 +91,10 @@ class navigate2DEnv(gym.Env):
             tmp_y_index = np.argmin(np.abs(DISTANCES[self.x_index, self.y_index] - DISTANCES[tmp_x_index, :]))
         elif action == 3:  # Up
             tmp_x_index = self.x_index
-            tmp_y_index = self.y_index + 4
-            while(DISTANCES[np.abs(tmp_x_index, tmp_y_index] - DISTANCES[tmp_x_index, tmp_y_index]) < 0.3):
-                tmp_y_index = tmp_y_index + 4
+            tmp_y_index = self.y_index + 3
         else:  # Down
             tmp_x_index = self.x_index
-            tmp_y_index = self.y_index - 4
-            while(DISTANCES[np.abs(tmp_x_index, tmp_y_index] - DISTANCES[tmp_x_index, tmp_y_index]) < 0.3):
-                tmp_y_index = tmp_y_index - 4
+            tmp_y_index = self.y_index - 3
         if tmp_x_index < 0 or tmp_x_index > X_STATES - 1 or tmp_y_index < 0 or tmp_y_index > Y_STATES - 1:
             obs = self.state
             reward = -0.1
