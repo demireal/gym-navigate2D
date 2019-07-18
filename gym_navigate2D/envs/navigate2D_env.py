@@ -32,6 +32,7 @@ for index_1, str_arr in enumerate(DISTANCES):
         
 for x_index in range(X_STATES):
     PATH_NAME = '/content/drive/My Drive/my_test_data_2D/' + str(x_index) + '/*.png'
+    print('File: ' + str(x_index) + ' of 19')
     for y_index, im_path in enumerate(sorted(glob.glob(PATH_NAME))):
         im = imageio.imread(im_path)
         im = im[im.shape[0] - CROP_HEIGHT - 32:im.shape[0] - 32, int(im.shape[1]/2 - CROP_WIDTH/2):int(im.shape[1]/2 + CROP_WIDTH/2), :-1]  # crop unnecessary black parts, lose alpha channel.
@@ -111,6 +112,7 @@ class navigate2DEnv(gym.Env):
             obs = self.state
             reward = -0.1
         else:
+            print('Old: (' + str(self.x_index) + ', ' + str(self.y_index) + ')  New: (' + str(tmp_x_index) + ', ' + str(tmp_y_index) + ')')
             self.x_index = tmp_x_index
             self.y_index = tmp_y_index
             self.flag = 6 < self.x_index < 8 and 55 < self.y_index < 61
