@@ -31,7 +31,7 @@ for index_1, str_arr in enumerate(DISTANCES):
 
         
 for x_index in range(X_STATES):
-    PATH_NAME = '/content/drive/My Drive/my_test_data_2D/' + str(x_index) + '/*.png'
+    PATH_NAME = '/content/drive/My Drive/UBC Research/my_test_data_2D/' + str(x_index) + '/*.png'
     print('File: ' + str(x_index) + ' of 19')
     for y_index, im_path in enumerate(sorted(glob.glob(PATH_NAME))):
         im = imageio.imread(im_path)
