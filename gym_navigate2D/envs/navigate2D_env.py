@@ -31,7 +31,7 @@ for index_1, str_arr in enumerate(DISTANCES):
 
         
 for x_index in range(X_STATES):
-    PATH_NAME = '/content/drive/My Drive/UBC Research/my_test_data_2D/' + str(x_index) + '/*.png'
+    PATH_NAME = '/content/drive/My Drive/my_test_data_2D/' + str(x_index) + '/*.png'
     for y_index, im_path in enumerate(sorted(glob.glob(PATH_NAME))):
         im = imageio.imread(im_path)
         im = im[im.shape[0] - CROP_HEIGHT - 32:im.shape[0] - 32, int(im.shape[1]/2 - CROP_WIDTH/2):int(im.shape[1]/2 + CROP_WIDTH/2), :-1]  # crop unnecessary black parts, lose alpha channel.
@@ -60,8 +60,24 @@ class navigate2DEnv(gym.Env):
 
     def reset(self):
         print('Episode: ' + str(self.nbEpisode))
-        self.x_index = random.randint(0, X_STATES - 1)
-        self.y_index = random.randint(0, Y_STATES - 1)
+        if self.nbEpisode < 10:
+          self.x_index = random.randint(5, 9)
+          self.y_index = random.randint(50, 66)
+        elif self.nbEpisode < 25:
+          self.x_index = random.randint(4, 11)
+          self.y_index = random.randint(40, 76)
+        elif self.nbEpisode < 45:
+          self.x_index = random.randint(3, 13)
+          self.y_index = random.randint(30, 86)
+        elif self.nbEpisode < 70:
+          self.x_index = random.randint(2, 15)
+          self.y_index = random.randint(20, 96)
+        elif self.nbEpisode < 100:
+          self.x_index = random.randint(1, 17)
+          self.y_index = random.randint(10, 106)
+        else:
+          self.x_index = random.randint(0, X_STATES - 1)
+          self.y_index = random.randint(0, Y_STATES - 1)
         self.state = STATE_ARRAY[:, :, self.x_index, self.y_index, np.newaxis]
         self.flag = False
         self.done = False
