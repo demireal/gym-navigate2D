@@ -112,7 +112,6 @@ class navigate2DEnv(gym.Env):
             obs = self.state
             reward = -0.1
         else:
-            print('Old: (' + str(self.x_index) + ', ' + str(self.y_index) + ')  New: (' + str(tmp_x_index) + ', ' + str(tmp_y_index) + ')')
             right_choice = (np.square(DISTANCES[self.x_index, self.y_index] - DISTANCES[7, 58]) + np.square((self.x_index - 10)*2 + 4)) > (np.square(DISTANCES[tmp_x_index, tmp_y_index] - DISTANCES[7, 58]) + np.square((tmp_x_index - 10)*2 + 4))
             self.x_index = tmp_x_index
             self.y_index = tmp_y_index
