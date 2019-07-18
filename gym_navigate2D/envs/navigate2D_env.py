@@ -87,13 +87,15 @@ class navigate2DEnv(gym.Env):
         elif action == 3:  # Up
             tmp_x_index = self.x_index
             tmp_y_index = self.y_index + 1
-            while(np.abs(DISTANCES[self.x_index, tmp_y_index] - DISTANCES[self.x_index, self.y_index]) < 0.38 and tmp_y_index < 112):
-              tmp_y_index += 1
+            if tmp_y_index < 112:
+              while(np.abs(DISTANCES[self.x_index, tmp_y_index] - DISTANCES[self.x_index, self.y_index]) < 0.38 and tmp_y_index < 112):
+                tmp_y_index += 1
         else:  # Down
             tmp_x_index = self.x_index
             tmp_y_index = self.y_index - 1
-            while(np.abs(DISTANCES[self.x_index, tmp_y_index] - DISTANCES[self.x_index, self.y_index]) < 0.38 and tmp_y_index > 0):
-              tmp_y_index -= 1
+            if tmp_y_index > 0:
+              while(np.abs(DISTANCES[self.x_index, tmp_y_index] - DISTANCES[self.x_index, self.y_index]) < 0.38 and tmp_y_index > 0):
+                tmp_y_index -= 1
               
         if tmp_x_index < 0 or tmp_x_index > X_STATES - 1 or tmp_y_index < 0 or tmp_y_index > Y_STATES - 1:
             obs = self.state
