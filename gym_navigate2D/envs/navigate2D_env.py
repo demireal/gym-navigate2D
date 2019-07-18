@@ -118,7 +118,7 @@ class navigate2DEnv(gym.Env):
             self.flag = 6 < self.x_index < 8 and 55 < self.y_index < 61
             self.done = self.flag and action == 0
             obs = STATE_ARRAY[:, :, self.x_index, self.y_index, np.newaxis]
-            reward = 0.1*(1 - self.done) + self.done
+            reward = -0.1*(1 - self.done) + self.done
         self.nbEpisode = self.nbEpisode + 1*self.done
 
         return obs, reward
