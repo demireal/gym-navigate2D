@@ -23,7 +23,7 @@ Y_STATES = 113
 NUM_OF_ACTIONS = 5
 STATE_ARRAY = np.zeros((INPUT_SHAPE[0], INPUT_SHAPE[1], X_STATES, Y_STATES))
 
-DF = pd.read_csv('/content/drive/My Drive/UBC Research/xy.csv')
+DF = pd.read_csv('/content/drive/My Drive/xy.csv')
 DISTANCES = DF.values
 for index_1, str_arr in enumerate(DISTANCES):
   for index_2, strr in enumerate(str_arr):
