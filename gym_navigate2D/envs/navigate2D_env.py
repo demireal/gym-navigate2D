@@ -31,7 +31,7 @@ for index_1, str_arr in enumerate(DISTANCES):
 
         
 for x_index in range(X_STATES):
-    PATH_NAME = '/content/drive/My Drive/UBC Research/my_test_data_2D/' + str(x_index) + '/*.png'
+    PATH_NAME = '/content/drive/My Drive/my_test_data_2D/' + str(x_index) + '/*.png'
     for y_index, im_path in enumerate(sorted(glob.glob(PATH_NAME))):
         im = imageio.imread(im_path)
         im = im[im.shape[0] - CROP_HEIGHT - 32:im.shape[0] - 32, int(im.shape[1]/2 - CROP_WIDTH/2):int(im.shape[1]/2 + CROP_WIDTH/2), :-1]  # crop unnecessary black parts, lose alpha channel.
@@ -111,15 +111,12 @@ class navigate2DEnv(gym.Env):
             obs = self.state
             reward = -0.1
         else:
-            right_choice = (np.square(self.x_index - 7) + np.square(self.y_index - 58)) > (np.square(tmp_x_index - 7) + np.square(tmp_y_index - 58))
-            print('Old: (' + str(self.x_index) + ', ' + str(self.y_index) + ')  New: (' + str(tmp_x_index) + ', ' + str(tmp_y_index) + ')')
             self.x_index = tmp_x_index
             self.y_index = tmp_y_index
             self.flag = 6 < self.x_index < 8 and 55 < self.y_index < 61
             self.done = self.flag and action == 0
             obs = STATE_ARRAY[:, :, self.x_index, self.y_index, np.newaxis]
-            reward = 0.1*(1 - self.done)*(-1 + 2*right_choice) + self.done
-            print(reward)
+            reward = 0.1*(1 - self.done) + self.done
         self.nbEpisode = self.nbEpisode + 1*self.done
 
         return obs, reward
