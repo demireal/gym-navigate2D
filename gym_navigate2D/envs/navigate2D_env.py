@@ -15,9 +15,9 @@ from matplotlib import pyplot as plt
 
 # Each state is an image. State space is 2D.
 
-CROP_HEIGHT = 240
-CROP_WIDTH = 240
-INPUT_SHAPE = (60, 60, 1)
+CROP_HEIGHT = 200
+CROP_WIDTH = 200
+INPUT_SHAPE = (50, 50, 1)
 X_STATES = 20
 Y_STATES = 113
 NUM_OF_ACTIONS = 5
