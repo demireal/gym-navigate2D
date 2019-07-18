@@ -113,12 +113,13 @@ class navigate2DEnv(gym.Env):
             reward = -0.1
         else:
             print('Old: (' + str(self.x_index) + ', ' + str(self.y_index) + ')  New: (' + str(tmp_x_index) + ', ' + str(tmp_y_index) + ')')
+            right_choice = (np.square(DISTANCES[self.x_index, self.y_index] - DISTANCES[7, 58]) + np.square((self.x_index - 10)*2 + 4)) > (np.square(DISTANCES[tmp_x_index, tmp_y_index] - DISTANCES[7, 58]) + np.square((tmp_x_index - 10)*2 + 4))
             self.x_index = tmp_x_index
             self.y_index = tmp_y_index
-            self.flag = 6 < self.x_index < 8 and 55 < self.y_index < 61
+            self.flag = 5 < self.x_index < 9 and 54 < self.y_index < 62
             self.done = self.flag and action == 0
             obs = STATE_ARRAY[:, :, self.x_index, self.y_index, np.newaxis]
-            reward = -0.1*(1 - self.done) + self.done
+            reward = 0.1*(1 - self.done)*(-1 + 2*right_choice) + self.done
         self.nbEpisode = self.nbEpisode + 1*self.done
 
         return obs, reward
