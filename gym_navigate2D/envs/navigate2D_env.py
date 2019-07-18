@@ -45,13 +45,14 @@ for x_index in range(X_STATES):
 class navigate2DEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
-    def __init__(self):
+    def __init__(self, is_test=0):
+        self.is_test = is_test
         self.x_index = random.randint(0, X_STATES - 1)
         self.y_index = random.randint(0, Y_STATES - 1)
         self.state = STATE_ARRAY[:, :, self.x_index, self.y_index, np.newaxis]
         self.flag = False
         self.done = False
-        self.nbEpisode = 1
+        self.nbEpisode = is_test*200 + 1
         self.action_space = spaces.Discrete(NUM_OF_ACTIONS)
         self.observation_space = spaces.Box(low=0, high=1, shape=INPUT_SHAPE, dtype='float32')
 
