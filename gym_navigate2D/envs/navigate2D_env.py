@@ -35,7 +35,7 @@ for x_index in range(X_STATES):
     print('File: ' + str(x_index) + ' of 19')
     for y_index, im_path in enumerate(sorted(glob.glob(PATH_NAME))):
         im = imageio.imread(im_path)
-        im = im[im.shape[0] - CROP_HEIGHT - 32:im.shape[0] - 32, int(im.shape[1]/2 - CROP_WIDTH/2):int(im.shape[1]/2 + CROP_WIDTH/2), :-1]  # crop unnecessary black parts, lose alpha channel.
+        im = im[:, :, :-1]  #lose alpha channel.
         img = Image.fromarray(im)
         img = img.resize((INPUT_SHAPE[0], INPUT_SHAPE[1])).convert('L')  # resize, convert to grey scale
         im = np.array(img)
@@ -91,6 +91,10 @@ class navigate2DEnv(gym.Env):
         print('Position: ( ' + str(self.x_index) + ', ' + str(self.y_index) + ')')
         sleep(1)
         clear_output()
+        
+    def close(self):
+        self.nbEpisode = 1
+        self.reset()
 
     def take_action(self, action):
         if action == 0:  # Wait
