@@ -15,8 +15,8 @@ from matplotlib import pyplot as plt
 
 # Each state is an image. State space is 2D.
 
-CROP_HEIGHT = 200
-CROP_WIDTH = 200
+CROP_HEIGHT = 300
+CROP_WIDTH = 300
 INPUT_SHAPE = (50, 50, 1)
 X_STATES = 20
 Y_STATES = 113
@@ -35,7 +35,7 @@ for x_index in range(X_STATES):
     print('File: ' + str(x_index) + ' of 19')
     for y_index, im_path in enumerate(sorted(glob.glob(PATH_NAME))):
         im = imageio.imread(im_path)
-        im = im[:, :, :-1]  #lose alpha channel.
+        im = im[im.shape[0] - CROP_HEIGHT:im.shape[0], int(im.shape[1]/2 - CROP_WIDTH/2):int(im.shape[1]/2 + CROP_WIDTH/2), :-1]  # crop unnecessary black parts, lose alpha channel.
         img = Image.fromarray(im)
         img = img.resize((INPUT_SHAPE[0], INPUT_SHAPE[1])).convert('L')  # resize, convert to grey scale
         im = np.array(img)
@@ -52,7 +52,7 @@ class navigate2DEnv(gym.Env):
         self.state = STATE_ARRAY[:, :, self.x_index, self.y_index, np.newaxis]
         self.flag = False
         self.done = False
-        self.nbEpisode = is_test*200 + 1
+        self.nbEpisode = 1
         self.action_space = spaces.Discrete(NUM_OF_ACTIONS)
         self.observation_space = spaces.Box(low=0, high=1, shape=INPUT_SHAPE, dtype='float32')
 
@@ -62,19 +62,19 @@ class navigate2DEnv(gym.Env):
 
     def reset(self):
         print('Episode: ' + str(self.nbEpisode))
-        if self.nbEpisode < 10:
+        if self.nbEpisode < 10 and self.is_test == 0:
           self.x_index = random.randint(5, 9)
           self.y_index = random.randint(50, 66)
-        elif self.nbEpisode < 25:
+        elif self.nbEpisode < 25 and self.is_test == 0:
           self.x_index = random.randint(4, 11)
           self.y_index = random.randint(40, 76)
-        elif self.nbEpisode < 45:
+        elif self.nbEpisode < 45 and self.is_test == 0:
           self.x_index = random.randint(3, 13)
           self.y_index = random.randint(30, 86)
-        elif self.nbEpisode < 70:
+        elif self.nbEpisode < 70 and self.is_test == 0:
           self.x_index = random.randint(2, 15)
           self.y_index = random.randint(20, 96)
-        elif self.nbEpisode < 100:
+        elif self.nbEpisode < 100 and self.is_test == 0:
           self.x_index = random.randint(1, 17)
           self.y_index = random.randint(10, 106)
         else:
@@ -91,11 +91,6 @@ class navigate2DEnv(gym.Env):
         print('Position: ( ' + str(self.x_index) + ', ' + str(self.y_index) + ')')
         sleep(1)
         clear_output()
-        
-    def close(self):
-        self.nbEpisode = 1
-        state = self.reset()
-        return state
 
     def take_action(self, action):
         if action == 0:  # Wait
