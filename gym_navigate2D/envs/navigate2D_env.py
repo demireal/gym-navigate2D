@@ -15,8 +15,6 @@ from matplotlib import pyplot as plt
 
 # Each state is an image. State space is 2D.
 
-CROP_HEIGHT = 300
-CROP_WIDTH = 300
 INPUT_SHAPE = (50, 50, 1)
 X_STATES = 20
 Y_STATES = 113
@@ -29,23 +27,12 @@ for index_1, str_arr in enumerate(DISTANCES):
   for index_2, strr in enumerate(str_arr):
      DISTANCES [index_1, index_2] = float(strr.replace(',','.'))
 
-        
-for x_index in range(X_STATES):
-    PATH_NAME = '/content/drive/My Drive/my_test_data_2D/' + str(x_index) + '/*.png'
-    print('File: ' + str(x_index) + ' of 19')
-    for y_index, im_path in enumerate(sorted(glob.glob(PATH_NAME))):
-        im = imageio.imread(im_path)
-        im = im[im.shape[0] - CROP_HEIGHT:im.shape[0], int(im.shape[1]/2 - CROP_WIDTH/2):int(im.shape[1]/2 + CROP_WIDTH/2), :-1]  # crop unnecessary black parts, lose alpha channel.
-        img = Image.fromarray(im)
-        img = img.resize((INPUT_SHAPE[0], INPUT_SHAPE[1])).convert('L')  # resize, convert to grey scale
-        im = np.array(img)
-        STATE_ARRAY[:, :, x_index, y_index] = im/255
-
-
+      
 class navigate2DEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
-    def __init__(self, is_test=0):
+    def __init__(self, path, is_test=0):
+        STATE_ARRAY = np.load(path)
         self.is_test = is_test
         self.x_index = random.randint(0, X_STATES - 1)
         self.y_index = random.randint(0, Y_STATES - 1)
