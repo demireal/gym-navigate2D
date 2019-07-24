@@ -94,7 +94,8 @@ class navigate2DEnv(gym.Env):
         
     def close(self):
         self.nbEpisode = 1
-        self.reset()
+        state = self.reset()
+        return state
 
     def take_action(self, action):
         if action == 0:  # Wait
