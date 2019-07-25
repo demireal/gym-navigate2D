@@ -19,7 +19,6 @@ INPUT_SHAPE = (50, 50, 1)
 X_STATES = 20
 Y_STATES = 113
 NUM_OF_ACTIONS = 5
-STATE_ARRAY = np.zeros((INPUT_SHAPE[0], INPUT_SHAPE[1], X_STATES, Y_STATES))
 
 DF = pd.read_csv('/content/drive/My Drive/xy.csv')
 DISTANCES = DF.values
@@ -32,11 +31,11 @@ class navigate2DEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
     def __init__(self, path, is_test=0):
-        STATE_ARRAY = np.load(path)
+        self.state_array = np.load(path)
         self.is_test = is_test
         self.x_index = random.randint(0, X_STATES - 1)
         self.y_index = random.randint(0, Y_STATES - 1)
-        self.state = STATE_ARRAY[:, :, self.x_index, self.y_index, np.newaxis]
+        self.state = self.state_array[:, :, self.x_index, self.y_index, np.newaxis]
         self.flag = False
         self.done = False
         self.nbEpisode = 1
@@ -67,7 +66,7 @@ class navigate2DEnv(gym.Env):
         else:
           self.x_index = random.randint(0, X_STATES - 1)
           self.y_index = random.randint(0, Y_STATES - 1)
-        self.state = STATE_ARRAY[:, :, self.x_index, self.y_index, np.newaxis]
+        self.state = self.state_array[:, :, self.x_index, self.y_index, np.newaxis]
         self.flag = False
         self.done = False
         return self.state
@@ -105,7 +104,7 @@ class navigate2DEnv(gym.Env):
             self.y_index = tmp_y_index
             self.flag = 5 < self.x_index < 9 and 54 < self.y_index < 62
             self.done = self.flag and action == 0
-            obs = STATE_ARRAY[:, :, self.x_index, self.y_index, np.newaxis]
+            obs = self.state_array[:, :, self.x_index, self.y_index, np.newaxis]
             reward = 0.1*(1 - self.done)*(-1 + 2*right_choice) + self.done
         self.nbEpisode = self.nbEpisode + 1*self.done
 
