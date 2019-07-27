@@ -15,9 +15,6 @@ from matplotlib import pyplot as plt
 
 # Each state is an image. State space is 2D.
 
-INPUT_SHAPE = (50, 50, 1)
-X_STATES = 20
-Y_STATES = 113
 NUM_OF_ACTIONS = 5
 
 DF = pd.read_csv('/content/drive/My Drive/xy.csv')
@@ -30,17 +27,20 @@ for index_1, str_arr in enumerate(DISTANCES):
 class navigate2DEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
-    def __init__(self, path, is_test=0):
-        self.state_array = np.load(path)
+    def __init__(self, is_test=0):
+        self.state_array = np.load()
+        self.x_states = self.state_array.shape[2]
+        self.y_states = self.state_array.shape[3]
+        self.input_shape = (self.state_array.shape[0], self.state_array.shape[1], 1)
         self.is_test = is_test
-        self.x_index = random.randint(0, X_STATES - 1)
-        self.y_index = random.randint(0, Y_STATES - 1)
+        self.x_index = random.randint(0, self.x_states - 1)
+        self.y_index = random.randint(0, self.y_states - 1)
         self.state = self.state_array[:, :, self.x_index, self.y_index, np.newaxis]
         self.flag = False
         self.done = False
         self.nbEpisode = 1
         self.action_space = spaces.Discrete(NUM_OF_ACTIONS)
-        self.observation_space = spaces.Box(low=0, high=1, shape=INPUT_SHAPE, dtype='float32')
+        self.observation_space = spaces.Box(low=0, high=1, shape=self.input_shape, dtype='float32')
 
     def step(self, action):
         self.state, reward = self.take_action(action)
@@ -64,8 +64,8 @@ class navigate2DEnv(gym.Env):
           self.x_index = random.randint(1, 17)
           self.y_index = random.randint(10, 106)
         else:
-          self.x_index = random.randint(0, X_STATES - 1)
-          self.y_index = random.randint(0, Y_STATES - 1)
+          self.x_index = random.randint(0, self.x_states - 1)
+          self.y_index = random.randint(0, self.y_states - 1)
         self.state = self.state_array[:, :, self.x_index, self.y_index, np.newaxis]
         self.flag = False
         self.done = False
@@ -84,10 +84,10 @@ class navigate2DEnv(gym.Env):
             tmp_y_index = self.y_index
         elif action == 1:  # Left
             tmp_x_index = self.x_index + 1
-            tmp_y_index = np.argmin(np.abs(DISTANCES[self.x_index, self.y_index] - DISTANCES[np.mod(tmp_x_index, X_STATES), :]))
+            tmp_y_index = np.argmin(np.abs(DISTANCES[self.x_index, self.y_index] - DISTANCES[np.mod(tmp_x_index, self.x_states), :]))
         elif action == 2:  # Right
             tmp_x_index = self.x_index - 1
-            tmp_y_index = np.argmin(np.abs(DISTANCES[self.x_index, self.y_index] - DISTANCES[np.mod(tmp_x_index, X_STATES), :]))
+            tmp_y_index = np.argmin(np.abs(DISTANCES[self.x_index, self.y_index] - DISTANCES[np.mod(tmp_x_index, self.x_states), :]))
         elif action == 3:  # Up
             tmp_x_index = self.x_index
             tmp_y_index = self.y_index + 3
@@ -95,7 +95,7 @@ class navigate2DEnv(gym.Env):
             tmp_x_index = self.x_index
             tmp_y_index = self.y_index - 3
               
-        if tmp_x_index < 0 or tmp_x_index > X_STATES - 1 or tmp_y_index < 0 or tmp_y_index > Y_STATES - 1:
+        if tmp_x_index < 0 or tmp_x_index > self.x_states - 1 or tmp_y_index < 0 or tmp_y_index > self.y_states - 1:
             obs = self.state
             reward = -0.1
         else:
