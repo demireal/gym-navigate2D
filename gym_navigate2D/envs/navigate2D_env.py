@@ -27,8 +27,8 @@ for index_1, str_arr in enumerate(DISTANCES):
 class navigate2DEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
-    def __init__(self, is_test=0):
-        self.state_array = np.load()
+    def __init__(self, path, is_test=0):
+        self.state_array = np.load(path)
         self.x_states = self.state_array.shape[2]
         self.y_states = self.state_array.shape[3]
         self.input_shape = (self.state_array.shape[0], self.state_array.shape[1], 1)
