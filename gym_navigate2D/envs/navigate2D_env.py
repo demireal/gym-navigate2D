@@ -17,7 +17,7 @@ from matplotlib import pyplot as plt
 
 NUM_OF_ACTIONS = 5
 
-DF = pd.read_csv('/content/drive/My Drive/xy.csv')
+DF = pd.read_csv('/content/drive/My Drive/UBC Research/xy.csv')
 DISTANCES = DF.values
 for index_1, str_arr in enumerate(DISTANCES):
   for index_2, strr in enumerate(str_arr):
