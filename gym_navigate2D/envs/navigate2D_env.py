@@ -34,7 +34,7 @@ class navigate2DEnv(gym.Env):
         self.done = False
         self.nbEpisode = 1
         self.action_space = spaces.Discrete(NUM_OF_ACTIONS)
-        self.observation_space = spaces.Box(low=0, high=255, shape=self.input_shape, dtype='np.uint8')
+        self.observation_space = spaces.Box(low=0, high=255, shape=self.input_shape, dtype='uint8')
 
     def step(self, action):
         self.state, reward = self.take_action(action)
