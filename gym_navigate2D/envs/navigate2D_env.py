@@ -3,7 +3,6 @@ import numpy as np
 import random
 import pandas as pd
 import cv2
-from time import sleep
 from IPython.display import clear_output
 from gym import spaces
 from matplotlib import pyplot as plt
@@ -71,8 +70,6 @@ class navigate2DEnv(gym.Env):
         plt.show()
         print('Position: ( ' + str(self.x_index) + ', ' + str(self.y_index) + ')')
         cv2.waitKey(0)
-        #sleep(1)
-        #clear_output()
 
     def take_action(self, action):
         if action == 0:  # Wait
