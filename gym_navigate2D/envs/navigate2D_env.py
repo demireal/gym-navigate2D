@@ -15,7 +15,7 @@ DF = pd.read_csv('/content/drive/My Drive/UBC Research/xy.csv')
 DISTANCES = DF.values
 for index_1, entry_array in enumerate(DISTANCES):
     for index_2, entry in enumerate(entry_array):
-        DISTANCES [index_1, index_2] = float(entry.replace(',', '.'))
+        DISTANCES[index_1, index_2] = float(entry.replace(',', '.'))
 
       
 class navigate2DEnv(gym.Env):
