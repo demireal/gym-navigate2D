@@ -22,6 +22,7 @@ class navigate2DEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
     def __init__(self, path, is_test=0):
+        print("HELLO")
         self.state_array = np.load(path)
         self.state_array = self.state_array.transpose(0, 2, 1)
         self.is_test = is_test
