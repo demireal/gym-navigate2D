@@ -52,22 +52,22 @@ class navigate2DEnv(gym.Env):
         self.flag = False
         self.done = False
 
-        if self.nbEpisode < 10:
+        if self.nbEpisode < 10 and self.is_test == 0:
             self.x_index = random.randint(195, 205)
             self.tilt_index = random.randint(45, 55)
-        elif self.nbEpisode < 30:
+        elif self.nbEpisode < 30 and self.is_test == 0:
             self.x_index = random.randint(185, 215)
             self.tilt_index = random.randint(45,55)
-        elif self.nbEpisode < 60:
+        elif self.nbEpisode < 60 and self.is_test == 0:
             self.x_index = random.randint(170, 230)
             self.tilt_index = random.randint(40, 60)
-        elif self.nbEpisode < 100:
+        elif self.nbEpisode < 100 and self.is_test == 0:
             self.x_index = random.randint(140, 260)
             self.tilt_index = random.randint(30, 70)
-        elif self.nbEpisode < 140:
+        elif self.nbEpisode < 140 and self.is_test == 0:
             self.x_index = random.randint(100, 300)
             self.tilt_index = random.randint(20, 80)
-        elif self.nbEpisode < 200:
+        elif self.nbEpisode < 200 and self.is_test == 0:
             self.x_index = random.randint(50, 350)
             self.tilt_index = random.randint(10, 90)
         else:
