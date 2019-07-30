@@ -13,8 +13,9 @@ PHI_MAX = 30
 
 X_STATES = 400
 TILT_STATES = 101
+ROT_STATES = 101
 NUM_OF_ACTIONS = 5
-IN_DIM = (1, 84, 84)
+IN_DIM = (1, 50, 50)
 MASK_FILE = '/content/drive/My Drive/UBC Research/mask.png'
 INTERPOLATION = cv2.INTER_NEAREST
 
@@ -33,8 +34,9 @@ class navigate2DEnv(gym.Env):
         self.state = None
         self.x_index = random.randint(0, X_STATES - 1)
         self.tilt_index = random.randint(0, TILT_STATES - 1)
+        self.rot_index = random.randint(0, ROT_STATES - 1)
 
-        self.mask = imageio.imread(MASK_FILE)[:,:,1]
+        self.mask = imageio.imread(MASK_FILE)[:, :, 1]
         self.mask = np.uint8(self.mask/255)
         self.mask = cv2.resize(self.mask, dsize=(400, 400), interpolation=INTERPOLATION)
 
@@ -53,66 +55,61 @@ class navigate2DEnv(gym.Env):
         self.done = False
 
         if self.nbEpisode < 10 and self.is_test == 0:
-            self.x_index = random.randint(190, 210)
-            self.tilt_index = random.randint(42, 58)
-        elif self.nbEpisode < 30 and self.is_test == 0:
-            self.x_index = random.randint(185, 215)
-            self.tilt_index = random.randint(40,60)
-        elif self.nbEpisode < 60 and self.is_test == 0:
-            self.x_index = random.randint(170, 230)
+            self.x_index = random.randint(180, 220)
+            self.tilt_index = random.randint(40, 60)
+            self.rot_index = random.randint(40, 60)
+        elif self.nbEpisode < 20 and self.is_test == 0:
+            self.x_index = random.randint(160, 240)
             self.tilt_index = random.randint(35, 65)
-        elif self.nbEpisode < 100 and self.is_test == 0:
+            self.rot_index = random.randint(35, 65)
+        elif self.nbEpisode < 40 and self.is_test == 0:
             self.x_index = random.randint(140, 260)
             self.tilt_index = random.randint(30, 70)
-        elif self.nbEpisode < 140 and self.is_test == 0:
+            self.rot_index = random.randint(30, 70)
+        elif self.nbEpisode < 70 and self.is_test == 0:
             self.x_index = random.randint(100, 300)
             self.tilt_index = random.randint(20, 80)
-        elif self.nbEpisode < 200 and self.is_test == 0:
+            self.rot_index = random.randint(20, 80)
+        elif self.nbEpisode < 100 and self.is_test == 0:
             self.x_index = random.randint(50, 350)
             self.tilt_index = random.randint(10, 90)
+            self.rot_index = random.randint(10, 90)
         else:
             self.x_index = random.randint(0, X_STATES - 1)
             self.tilt_index = random.randint(0, TILT_STATES - 1)
+            self.rot_index = random.randint(0, ROT_STATES - 1)
 
-        self.state = self.get_slice(0, self.tilt_index*2/100 - 1, self.x_index*2/399 - 1)
+        self.state = self.get_slice(self.rot_index*2/100 - 1, self.tilt_index*2/100 - 1, self.x_index*2/399 - 1)
         state = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)
         state = state[np.newaxis, :, :]
 
         return state
 
     def render(self, mode='human'):
-        plt.imshow(self.state, cmap='gray', vmin=0, vmax=255)
-        plt.show()
-        print('Position: ( ' + str(self.x_index) + ', ' + str(self.tilt_index) + ')')
+        cv2.imshow('image', self.state)
         cv2.waitKey(0)
+        cv2.destroyAllWindows()
+        print('(ROT, TILT, X): ( ' + str(self.rot_index) + ', ' + str(self.tilt_index) + ', ' + str(self.x_index) + ')')
 
     def take_action(self, action):
-        if action == 0:  # Wait
-            temp_x = self.x_index
-            temp_tilt = self.tilt_index
-        elif action == 1:  # Left
-            temp_x = self.x_index - 10
-            temp_tilt = self.tilt_index
-        elif action == 2:  # Right
-            temp_x = self.x_index + 10
-            temp_tilt = self.tilt_index
-        elif action == 3:  # Up
-            temp_x = self.x_index
-            temp_tilt = self.tilt_index + 5
-        else:  # Down
-            temp_x = self.x_index
-            temp_tilt = self.tilt_index - 5
 
-        if temp_x < 0 or temp_x > X_STATES - 1 or temp_tilt < 0 or temp_tilt > TILT_STATES - 1:
+        temp_x = (self.x_index - 8)*(action == 1) + (self.x_index + 8)*(action == 2) + self.x_index*(action == 0)
+        temp_tilt = (self.tilt_index - 2)*(action == 3) + (self.tilt_index + 2)*(action == 4) + self.tilt_index*(action == 0)
+        temp_rot = (self.rot_index - 2)*(action == 5) + (self.rot_index + 2)*(action == 6) + self.rot_index*(action == 0)
+
+        if temp_x < 0 or temp_x > (X_STATES - 1) or temp_tilt < 0 or temp_tilt > (TILT_STATES - 1) or\
+                temp_rot < 0 or temp_rot > (ROT_STATES - 1):
             obs = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]
             reward = -0.1
         else:
-            reinf = np.abs(self.x_index - 199) + np.abs(self.tilt_index - 50) > np.abs(temp_x - 199) + np.abs(temp_tilt - 50)
+            reinf = np.abs(self.x_index - 199) + np.abs(self.tilt_index - 50) + np.abs(self.rot_index - 50)\
+                    > np.abs(temp_x - 199) + np.abs(temp_tilt - 50) + np.abs(temp_rot - 50)
             self.x_index = temp_x
             self.tilt_index = temp_tilt
-            self.flag = 194 < self.x_index < 205 and 47 < self.tilt_index < 53
+            self.rot_index = temp_rot
+            self.flag = 195 < self.x_index < 204 and 48 < self.tilt_index < 51 and 48 < self.rot_index < 51
             self.done = self.flag and action == 0
-            self.state = self.get_slice(0, self.tilt_index*2/100 - 1, self.x_index*2/399 - 1)
+            self.state = self.get_slice(self.rot_index*2/100 - 1, self.tilt_index*2/100 - 1, self.x_index*2/399 - 1)
             obs = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]
             reward = 0.1*(1 - self.done)*(-1 + 2*reinf) + self.done/5
 
