@@ -11,10 +11,10 @@ from matplotlib import pyplot as plt
 
 PHI_MAX = 30
 
-X_STATES = 400
+X_STATES = 4001
 TILT_STATES = 101
 NUM_OF_ACTIONS = 5
-IN_DIM = (1, 84, 84)
+IN_DIM = (1, 50, 501)
 MASK_FILE = '/content/drive/My Drive/UBC Research/mask.png'
 INTERPOLATION = cv2.INTER_NEAREST
 
