@@ -44,6 +44,7 @@ class navigate2DEnv(gym.Env):
         self.z0 = dims[2]
 
     def step(self, action):
+        print(action)
         state, reward = self.take_action(action)
         return state, reward, self.done, {}
 
