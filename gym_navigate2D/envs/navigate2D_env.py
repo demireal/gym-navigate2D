@@ -78,10 +78,10 @@ class navigate2DEnv(gym.Env):
 
     def take_action(self, action):
 
-        temp_x = (self.x_index - 8) * (action == 1) + (self.x_index + 8) * (action == 2) + self.x_index * (action != 1 and action != 2)
-        temp_tilt = (self.tilt_index - 3) * (action == 3) + (self.tilt_index + 3) * (action == 4) + self.tilt_index * (action != 3 and action != 4)
+        temp_x = int((self.x_index - 8) * (action == 1) + (self.x_index + 8) * (action == 2) + self.x_index * (action != 1 and action != 2))
+        temp_tilt = int((self.tilt_index - 3) * (action == 3) + (self.tilt_index + 3) * (action == 4) + self.tilt_index * (action != 3 and action != 4))
 
-        if temp_x < 0 or temp_x > X_STATES - 1 or temp_tilt < 0 or temp_tilt > TILT_STATES - 1:
+        if temp_x < 0 or temp_x > (X_STATES - 1) or temp_tilt < 0 or temp_tilt > (TILT_STATES - 1):
             obs = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]
             reward = -0.1
         else:
