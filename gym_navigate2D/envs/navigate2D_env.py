@@ -78,9 +78,9 @@ class navigate2DEnv(gym.Env):
         return state
 
     def render(self, mode='human'):
-        cv2.imshow('image', self.state)
+        plt.imshow(self.state[0, :, :], cmap='gray', vmin=0, vmax=255)
+        plt.show()
         cv2.waitKey(0)
-        cv2.destroyAllWindows()
         print('(TILT, X): ( ' + str(self.tilt_index) + ', ' + str(self.x_index) + ')')
 
     def take_action(self, action):
