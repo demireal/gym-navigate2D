@@ -71,7 +71,7 @@ class navigate2DEnv(gym.Env):
         return state
 
     def render(self, mode='human'):
-        plt.imshow(self.state[0, :, :], cmap='gray', vmin=0, vmax=255)
+        plt.imshow(self.state, cmap='gray', vmin=0, vmax=255)
         plt.show()
         cv2.waitKey(0)
         print('(TILT, X): ( ' + str(self.tilt_index) + ', ' + str(self.x_index) + ')')
