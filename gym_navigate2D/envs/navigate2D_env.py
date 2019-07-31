@@ -48,7 +48,6 @@ class navigate2DEnv(gym.Env):
         return state, reward, self.done, {}
 
     def reset(self):
-        print('Episode: ' + str(self.nbEpisode))
         self.flag = False
         self.done = False
 
