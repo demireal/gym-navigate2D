@@ -78,8 +78,8 @@ class navigate2DEnv(gym.Env):
 
     def take_action(self, action):
 
-        temp_x = int((self.x_index - 16) * (action == 1) + (self.x_index + 16) * (action == 2) + self.x_index * (action != 1 and action != 2))
-        temp_tilt = int((self.tilt_index - 4) * (action == 3) + (self.tilt_index + 4) * (action == 4) + self.tilt_index * (action != 3 and action != 4))
+        temp_x = int((self.x_index - 8) * (action == 1) + (self.x_index + 8) * (action == 2) + self.x_index * (action != 1 and action != 2))
+        temp_tilt = int((self.tilt_index - 2) * (action == 3) + (self.tilt_index + 2) * (action == 4) + self.tilt_index * (action != 3 and action != 4))
 
         if temp_x < 0 or temp_x > (X_STATES - 1) or temp_tilt < 0 or temp_tilt > (TILT_STATES - 1):
             obs = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]
@@ -88,7 +88,7 @@ class navigate2DEnv(gym.Env):
             reinf = np.abs(self.x_index - 199) + np.abs(self.tilt_index - 50) > np.abs(temp_x - 199) + np.abs(temp_tilt - 50)
             self.x_index = temp_x
             self.tilt_index = temp_tilt
-            self.flag = 191 < self.x_index < 208 and 48 < self.tilt_index < 53
+            self.flag = 195 < self.x_index < 204 and 49 < self.tilt_index < 52
             self.done = self.flag and action == 0
             self.state = self.get_slice(0, self.tilt_index*2/100 - 1, self.x_index*2/399 - 1)
             obs = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]
