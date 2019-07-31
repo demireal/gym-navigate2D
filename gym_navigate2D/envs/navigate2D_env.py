@@ -55,16 +55,10 @@ class navigate2DEnv(gym.Env):
             self.x_index = random.randint(180, 220)
             self.tilt_index = random.randint(40, 60)
         elif self.nbEpisode < 20 and self.is_test == 0:
-            self.x_index = random.randint(160, 240)
-            self.tilt_index = random.randint(35, 65)
-        elif self.nbEpisode < 40 and self.is_test == 0:
             self.x_index = random.randint(140, 260)
             self.tilt_index = random.randint(30, 70)
-        elif self.nbEpisode < 70 and self.is_test == 0:
+        elif self.nbEpisode < 30 and self.is_test == 0:
             self.x_index = random.randint(100, 300)
-            self.tilt_index = random.randint(20, 80)
-        elif self.nbEpisode < 100 and self.is_test == 0:
-            self.x_index = random.randint(50, 350)
             self.tilt_index = random.randint(10, 90)
         else:
             self.x_index = random.randint(0, X_STATES - 1)
@@ -85,7 +79,7 @@ class navigate2DEnv(gym.Env):
     def take_action(self, action):
 
         temp_x = (self.x_index - 8) * (action == 1) + (self.x_index + 8) * (action == 2) + self.x_index * (action != 1 and action != 2)
-        temp_tilt = (self.tilt_index - 2) * (action == 3) + (self.tilt_index + 2) * (action == 4) + self.tilt_index * (action != 3 and action != 4)
+        temp_tilt = (self.tilt_index - 3) * (action == 3) + (self.tilt_index + 3) * (action == 4) + self.tilt_index * (action != 3 and action != 4)
 
         if temp_x < 0 or temp_x > X_STATES - 1 or temp_tilt < 0 or temp_tilt > TILT_STATES - 1:
             obs = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]
@@ -94,7 +88,7 @@ class navigate2DEnv(gym.Env):
             reinf = np.abs(self.x_index - 199) + np.abs(self.tilt_index - 50) > np.abs(temp_x - 199) + np.abs(temp_tilt - 50)
             self.x_index = temp_x
             self.tilt_index = temp_tilt
-            self.flag = 195 < self.x_index < 204 and 48 < self.tilt_index < 51
+            self.flag = 195 < self.x_index < 204 and 48 < self.tilt_index < 52
             self.done = self.flag and action == 0
             self.state = self.get_slice(0, self.tilt_index*2/100 - 1, self.x_index*2/399 - 1)
             obs = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]
