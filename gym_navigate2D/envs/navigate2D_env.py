@@ -24,6 +24,7 @@ class navigate2DEnv(gym.Env):
     def __init__(self, path, is_test=0, is_same=0):
         self.state_array = np.load(path)
         self.state_array = self.state_array.transpose(0, 2, 1)
+        self.state_array = np.array(self.state_array , np.float64)
         self.is_test = is_test
         self.is_same = is_same
         self.nbEpisode = 1
@@ -150,5 +151,5 @@ class navigate2DEnv(gym.Env):
         # --- 3: Mask slice ---
         the_slice += 40*np.random.randn(400, 400)
         the_slice = np.clip(the_slice, 0, 255)
-        the_slice = np.multiply(the_slice, self.mask)
+        the_slice = np.multiply(np.array(the_slice, np.uint8), mask)
         return the_slice
