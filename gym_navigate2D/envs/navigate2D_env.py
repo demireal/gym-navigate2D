@@ -54,7 +54,7 @@ class navigate2DEnv(gym.Env):
         self.done = False
         self.state_array = self.data + random.randint(0, 60)*np.random.randn(400, 400, 400)
         self.state_array = np.clip(self.state_array, 0, 255)
-        self.state_array = np.multiply(np.array(self.state_array, np.uint8), self.mask)
+        self.state_array = np.array(self.state_array, np.uint8)
 
         if self.nbEpisode < 10 and self.is_test == 0 and self.is_same == 0:
             self.x_index = random.randint(180, 220)
