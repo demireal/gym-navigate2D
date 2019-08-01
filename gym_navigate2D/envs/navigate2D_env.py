@@ -52,7 +52,7 @@ class navigate2DEnv(gym.Env):
     def reset(self):
         self.flag = False
         self.done = False
-        self.state_array = self.data + 40*np.random.randn(400, 400)
+        self.state_array = self.data + 40*np.random.randn(400, 400, 400)
         self.state_array = np.clip(self.state_array, 0, 255)
         self.state_array = np.multiply(np.array(self.state_array, np.uint8), self.mask)
 
