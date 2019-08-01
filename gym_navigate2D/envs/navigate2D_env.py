@@ -21,7 +21,7 @@ INTERPOLATION = cv2.INTER_NEAREST
 class navigate2DEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
-    def __init__(self, path, is_test=0):
+    def __init__(self, path, is_test=0, is_same=0):
         self.state_array = np.load(path)
         self.state_array = self.state_array.transpose(0, 2, 1)
         self.is_test = is_test
@@ -51,13 +51,13 @@ class navigate2DEnv(gym.Env):
         self.flag = False
         self.done = False
 
-        if self.nbEpisode < 10 and self.is_test == 0:
+        if self.nbEpisode < 10 and self.is_test == 0 and self.is.same == 0:
             self.x_index = random.randint(180, 220)
             self.tilt_index = random.randint(40, 60)
-        elif self.nbEpisode < 20 and self.is_test == 0:
+        elif self.nbEpisode < 20 and self.is_test == 0 and self.is.same == 0:
             self.x_index = random.randint(140, 260)
             self.tilt_index = random.randint(30, 70)
-        elif self.nbEpisode < 30 and self.is_test == 0:
+        elif self.nbEpisode < 30 and self.is_test == 0 and self.is.same == 0:
             self.x_index = random.randint(100, 300)
             self.tilt_index = random.randint(10, 90)
         else:
