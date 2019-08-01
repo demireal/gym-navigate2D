@@ -151,5 +151,5 @@ class navigate2DEnv(gym.Env):
         # --- 3: Mask slice ---
         the_slice += 40*np.random.randn(400, 400)
         the_slice = np.clip(the_slice, 0, 255)
-        the_slice = np.multiply(np.array(the_slice, np.uint8), mask)
+        the_slice = np.multiply(np.array(the_slice, np.uint8), self.mask)
         return the_slice
