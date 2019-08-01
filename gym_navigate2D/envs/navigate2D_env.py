@@ -97,7 +97,7 @@ class navigate2DEnv(gym.Env):
             self.done = self.flag and action == 0
             self.state = self.get_slice(0, self.tilt_index*2/(TILT_STATES - 1) - 1, self.x_index*2/(X_STATES - 1) - 1)
             obs = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]
-            reward = 0.1*(1 - self.done)*(-1 + 2*reinf) + self.done/9
+            reward = 0.1*(1 - self.done)*(-1 + 2*reinf) + self.done
 
         self.nbEpisode = self.nbEpisode + 1*self.done
 
