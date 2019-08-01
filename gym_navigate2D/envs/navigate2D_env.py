@@ -91,14 +91,14 @@ class navigate2DEnv(gym.Env):
             reward = -0.1
         else:
             reinf = np.abs(self.x_index - 199) + np.abs(self.tilt_index - 50) > np.abs(temp_x - 199) + np.abs(temp_tilt - 50)
-            reinf_weight = (np.abs(temp_x - 199) + np.abs(temp_tilt - 50))
+            reinf_weight = (np.abs(self.x_index - 199) + np.abs(self.tilt_index - 50))
             self.x_index = temp_x
             self.tilt_index = temp_tilt
             self.flag = 195 < self.x_index < 204 and 48 < self.tilt_index < 52
             self.done = self.flag and action == 0
             self.state = self.get_slice(0, self.tilt_index*2/100 - 1, self.x_index*2/399 - 1)
             obs = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]
-            reward = 0.1*(1 - self.done)*(-1 + 2*reinf)*(1/(1 + np.exp(-reinf_weight)) - 0.5) + self.done
+            reward = 0.2*(1 - self.done)*(-1 + 2*reinf)*(1/(1 + np.exp(-(reinf_weight/250))) - 0.506) + self.done
 
         self.nbEpisode = self.nbEpisode + 1*self.done
 
