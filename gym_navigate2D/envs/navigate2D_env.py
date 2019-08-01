@@ -25,6 +25,7 @@ class navigate2DEnv(gym.Env):
         self.state_array = np.load(path)
         self.state_array = self.state_array.transpose(0, 2, 1)
         self.is_test = is_test
+        self.is_same = is_same
         self.nbEpisode = 1
         self.action_space = spaces.Discrete(NUM_OF_ACTIONS)
         self.observation_space = spaces.Box(low=0, high=255, shape=IN_DIM, dtype='uint8')
