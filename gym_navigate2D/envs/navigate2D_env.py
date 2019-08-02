@@ -54,7 +54,7 @@ class navigate2DEnv(gym.Env):
     def reset(self):
         self.flag = False
         self.done = False
-        self.state_array = self.data + random.randint(0, 60)*np.random.randn(400, 400, 400)
+        self.state_array = self.data + random.randint(0, 50)*np.random.randn(400, 400, 400)
         self.state_array = np.clip(self.state_array, 0, 255)
         self.state_array = np.array(self.state_array, np.uint8)
 
@@ -107,7 +107,7 @@ class navigate2DEnv(gym.Env):
             self.done = self.flag and action == 0
             self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.tilt_index*2/(TILT_STATES - 1) - 1, self.x_index*2/(X_STATES - 1) - 1)
             obs = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]
-            reward = 0.1*(1 - self.done)*(-1 + 2*reinf) + self.done/9
+            reward = 0.1*(1 - self.done)*(-1 + 2*reinf) + self.done
 
         self.nbEpisode = self.nbEpisode + 1*self.done
 
