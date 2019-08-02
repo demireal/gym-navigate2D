@@ -89,9 +89,9 @@ class navigate2DEnv(gym.Env):
 
     def take_action(self, action):
 
-        temp_x = (self.x_index - 8)*(action == 1) + (self.x_index + 8)*(action == 2) + self.x_index*(action != 1 and action != 2)
-        temp_tilt = (self.tilt_index - 2)*(action == 3) + (self.tilt_index + 2)*(action == 4) + self.tilt_index*(action != 3 and action != 4)
-        temp_rot = (self.rot_index - 2)*(action == 5) + (self.rot_index + 2)*(action == 6) + self.rot_index*(action != 5 and action != 6)
+        temp_x = int((self.x_index - 8)*(action == 1) + (self.x_index + 8)*(action == 2) + self.x_index*(action != 1 and action != 2))
+        temp_tilt = int((self.tilt_index - 2)*(action == 3) + (self.tilt_index + 2)*(action == 4) + self.tilt_index*(action != 3 and action != 4))
+        temp_rot = int((self.rot_index - 2)*(action == 5) + (self.rot_index + 2)*(action == 6) + self.rot_index*(action != 5 and action != 6))
 
         if temp_x < 0 or temp_x > (X_STATES - 1) or temp_tilt < 0 or temp_tilt > (TILT_STATES - 1) or\
                 temp_rot < 0 or temp_rot > (ROT_STATES - 1):
