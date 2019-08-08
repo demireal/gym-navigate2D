@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 
 # Each state is an image. State space is 2D.
 
-PHI_MAX = 301
+PHI_MAX = 30
 
 X_STATES = 400
 TILT_STATES = 101
