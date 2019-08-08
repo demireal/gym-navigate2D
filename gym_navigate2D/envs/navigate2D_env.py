@@ -69,7 +69,7 @@ class navigate2DEnv(gym.Env):
         self.y_tilt_index = random.randint(0, Y_TILT_STATES - 1)
         self.rot_index = random.randint(0, ROT_STATES - 1)
 
-        self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.tilt_index*2/(TILT_STATES - 1) - 1, self.x_index*2/(X_STATES - 1) - 1)  # Revise this partafter having the method
+        self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.tilt_index*2/(TILT_STATES - 1) - 1, self.x_index*2/(X_STATES - 1) - 1)  # Revise this part after having the method
         state = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)
         state = state[np.newaxis, :, :]  # Check if the new method also returns image in (H, W) format
 
@@ -84,79 +84,33 @@ class navigate2DEnv(gym.Env):
     def take_action(self, action):
 
         temp_x = int((self.x_index - 8)*(action == 1) + (self.x_index + 8)*(action == 2) + self.x_index*(action != 1 and action != 2))
-        temp_y = int((self.x_index - 8)*(action == 3) + (self.x_index + 8)*(action == 4) + self.x_index*(action != 3 and action != 4))
-        temp_x_tilt = int((self.tilt_index - 2)*(action == 5) + (self.tilt_index + 2)*(action == 6) + self.tilt_index*(action != 5 and action != 6))
-        temp_y_tilt = int((self.tilt_index - 2)*(action == 7) + (self.tilt_index + 2)*(action == 8) + self.tilt_index*(action != 7 and action != 8))
+        temp_y = int((self.y_index - 8)*(action == 3) + (self.y_index + 8)*(action == 4) + self.y_index*(action != 3 and action != 4))
+        temp_x_tilt = int((self.x_tilt_index - 2)*(action == 5) + (self.x_tilt_index + 2)*(action == 6) + self.x_tilt_index*(action != 5 and action != 6))
+        temp_y_tilt = int((self.y_tilt_index - 2)*(action == 7) + (self.y_tilt_index + 2)*(action == 8) + self.y_tilt_index*(action != 7 and action != 8))
         temp_rot = int((self.rot_index - 2)*(action == 9) + (self.rot_index + 2)*(action == 10) + self.rot_index*(action != 9 and action != 10))
 
-        if temp_x < 0 or temp_x > (X_STATES - 1) or temp_tilt < 0 or temp_tilt > (TILT_STATES - 1) or\
+        if temp_x < 0 or temp_x > (X_STATES - 1) or temp_y < 0 or temp_y > (Y_STATES - 1) or\
+                temp_x_tilt < 0 or temp_x_tilt > (X_TILT_STATES - 1) or\
+                temp_y_tilt < 0 or temp_y_tilt > (Y_TILT_STATES - 1) or\
                 temp_rot < 0 or temp_rot > (ROT_STATES - 1):
-            obs = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]
+            obs = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]  # Check here if method returns (H, W) format
             reward = -0.1
+
+        # Check the target image intervals
         else:
-            reinf = np.abs(self.x_index - 199) + np.abs(self.tilt_index - 50) + np.abs(self.rot_index - 50)\
-                    > np.abs(temp_x - 199) + np.abs(temp_tilt - 50) + np.abs(temp_rot - 50)
+            reinf = np.abs(self.x_index - 199) + np.abs(self.y_index - 199) + np.abs(self.x_tilt_index - 50) + np.abs(self.y_tilt_index - 50) + np.abs(self.rot_index - 50)\
+                    > np.abs(temp_x - 199) + np.abs(temp_y - 199) + np.abs(temp_x_tilt - 50) + np.abs(temp_y_tilt - 50) + np.abs(temp_rot - 50)
             self.x_index = temp_x
-            self.tilt_index = temp_tilt
+            self.y_index = temp_y
+            self.x_tilt_index = temp_x_tilt
+            self.y_tilt_index = temp_y_tilt
             self.rot_index = temp_rot
-            self.flag = 195 < self.x_index < 204 and 48 < self.tilt_index < 51 and 48 < self.rot_index < 51
+            self.flag = 195 < self.x_index < 204 and 195 < self.y_index < 204 and 48 < self.x_tilt_index < 51 and 48 < self.y_tilt_index < 51 and 48 < self.rot_index < 51
             self.done = self.flag and action == 0
-            self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.tilt_index*2/(TILT_STATES - 1) - 1, self.x_index*2/(X_STATES - 1) - 1)
-            obs = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]
+            self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.tilt_index*2/(TILT_STATES - 1) - 1, self.x_index*2/(X_STATES - 1) - 1)  #  New method
+            obs = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]  # Again check if new method returns (H, W)
             reward = 0.1*(1 - self.done)*(-1 + 2*reinf) + self.done
 
         self.nbEpisode = self.nbEpisode + 1*self.done
 
         return obs, reward
-
-    def get_bounding_box(self, theta, phi, dist):
-        h1 = [self.x0 / 2 + self.y0 / 2 * math.sin(theta) + dist,  # *math.cos(theta),
-              self.y0 / 2 - self.y0 / 2 * math.cos(theta)]  # + dist*math.sin(theta)]
-
-        h2 = [self.x0 / 2 - self.y0 / 2 * math.sin(theta) + dist,  # *math.cos(theta),
-              self.y0 / 2 + self.y0 / 2 * math.cos(theta)]  # + dist*math.sin(theta)]
-
-        z_min = 0  # self.z0 / 2 - self.z0 / 2 * math.cos(phi)
-        z_max = self.z0 * math.cos(phi)  # self.z0 / 2 + self.z0 / 2 * math.cos(phi)
-        return h1, h2, z_min, z_max
-
-    def get_slice(self, theta_n, phi_n, dist_n):
-        theta = theta_n * math.pi
-        phi = math.radians(phi_n * PHI_MAX)
-        dist = dist_n * self.x0 / 2  # +/- 104 pixels
-
-        # --- 1: Get bounding box dims ---
-        h1, h2, z_min, z_max = self.get_bounding_box(theta=theta, phi=phi, dist=dist)
-        w = self.y0
-        h = self.z0
-
-        # --- 2: Extract slice from volume ---
-        # Get x_i and y_i for current layer
-        x_offsets = np.linspace(0, h, h) * math.sin(phi) * math.cos(
-            theta)  # np.linspace(-h/2, h/2, h) * math.sin(phi) * math.cos(theta)
-        y_offsets = np.linspace(0, h, h) * math.sin(phi) * math.sin(
-            theta)  # np.linspace(-h/2, h/2, h) * math.sin(phi) * math.sin(theta)
-
-        # Tile and transpose
-        x_offsets = np.transpose(np.tile(x_offsets, (w, 1)))
-        y_offsets = np.transpose(np.tile(y_offsets, (w, 1)))
-
-        x_i = np.tile(np.linspace(h1[0], h2[0], w), (h, 1))
-        y_i = np.tile(np.linspace(h1[1], h2[1], w), (h, 1))
-
-        x_i = np.array(np.rint(x_i + x_offsets), dtype='int')
-        y_i = np.array(np.rint(y_i + y_offsets), dtype='int')
-
-        # Don't forget to include the index offset from z!
-        z_i = np.transpose(np.tile(np.linspace(z_min, z_max, h), (w, 1)))
-        z_i = np.array(np.rint(z_i), dtype='int')
-
-        # Flatten
-        flat_inds = np.ravel_multi_index((x_i, y_i, z_i), (self.x0, self.y0, self.z0), mode='clip')
-
-        # Fill in entire slice at once
-        the_slice = np.take(self.state_array, flat_inds)
-
-        # --- 3: Mask slice ---
-        the_slice = np.multiply(the_slice, self.mask)
-        return the_slice
