@@ -7,14 +7,16 @@ import imageio
 from gym import spaces
 from matplotlib import pyplot as plt
 
-# Each state is an image. State space is 2D.
-
 PHI_MAX = 30
 
+# Set here manually.
 X_STATES = 400
-TILT_STATES = 101
+Y_STATES = 400
+X_TILT_STATES = 101
+Y_TILT_STATES = 101
 ROT_STATES = 101
-NUM_OF_ACTIONS = 7
+NUM_OF_ACTIONS = 11
+
 IN_DIM = (1, 84, 84)
 MASK_FILE = '/content/drive/My Drive/UBC Research/mask.png'
 INTERPOLATION = cv2.INTER_NEAREST
@@ -24,7 +26,7 @@ class navigate2DEnv(gym.Env):
 
     def __init__(self, path, is_test=0, is_same=0):
         self.state_array = np.load(path)
-        self.state_array = self.state_array.transpose(0, 2, 1)
+        self.state_array = self.state_array.transpose(0, 2, 1)  # Revise this part after having the method
         self.data = self.state_array
         self.is_test = is_test
         self.is_same = is_same
@@ -35,13 +37,16 @@ class navigate2DEnv(gym.Env):
         self.done = False
         self.state = None
         self.x_index = random.randint(0, X_STATES - 1)
-        self.tilt_index = random.randint(0, TILT_STATES - 1)
+        self.y_index = random.randint(0, Y_STATES - 1)
+        self.x_tilt_index = random.randint(0, X_TILT_STATES - 1)
+        self.y_tilt_index = random.randint(0, Y_TILT_STATES - 1)
         self.rot_index = random.randint(0, ROT_STATES - 1)
 
         self.mask = imageio.imread(MASK_FILE)[:, :, 1]
         self.mask = np.uint8(self.mask/255)
         self.mask = cv2.resize(self.mask, dsize=(400, 400), interpolation=INTERPOLATION)
-
+         
+        #  Revise this part after having the method
         dims = self.state_array.shape
         self.x0 = dims[0]
         self.y0 = dims[1]
@@ -54,30 +59,19 @@ class navigate2DEnv(gym.Env):
     def reset(self):
         self.flag = False
         self.done = False
-        self.state_array = self.data + random.randint(0, 50)*np.random.randn(400, 400, 400)
+        self.state_array = self.data + random.randint(0, 50)*np.random.randn(400, 400, 400)  # Revise the array dimension after having new data
         self.state_array = np.clip(self.state_array, 0, 255)
         self.state_array = np.array(self.state_array, np.uint8)
 
-        if self.nbEpisode < 10 and self.is_test == 0 and self.is_same == 0:
-            self.x_index = random.randint(170, 230)
-            self.tilt_index = random.randint(40, 60)
-            self.rot_index = random.randint(40, 60)
-        elif self.nbEpisode < 20 and self.is_test == 0 and self.is_same == 0:
-            self.x_index = random.randint(140, 260)
-            self.tilt_index = random.randint(30, 70)
-            self.rot_index = random.randint(30, 70)
-        elif self.nbEpisode < 40 and self.is_test == 0 and self.is_same == 0:
-            self.x_index = random.randint(100, 300)
-            self.tilt_index = random.randint(10, 90)
-            self.rot_index = random.randint(10, 90)
-        else:
-            self.x_index = random.randint(0, X_STATES - 1)
-            self.tilt_index = random.randint(0, TILT_STATES - 1)
-            self.rot_index = random.randint(0, ROT_STATES - 1)
+        self.x_index = random.randint(0, X_STATES - 1)
+        self.y_index = random.randint(0, Y_STATES - 1)
+        self.x_tilt_index = random.randint(0, X_TILT_STATES - 1)
+        self.y_tilt_index = random.randint(0, Y_TILT_STATES - 1)
+        self.rot_index = random.randint(0, ROT_STATES - 1)
 
-        self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.tilt_index*2/(TILT_STATES - 1) - 1, self.x_index*2/(X_STATES - 1) - 1)
+        self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.tilt_index*2/(TILT_STATES - 1) - 1, self.x_index*2/(X_STATES - 1) - 1)  # Revise this partafter having the method
         state = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)
-        state = state[np.newaxis, :, :]
+        state = state[np.newaxis, :, :]  # Check if the new method also returns image in (H, W) format
 
         return state
 
@@ -85,13 +79,15 @@ class navigate2DEnv(gym.Env):
         plt.imshow(self.state, cmap='gray', vmin=0, vmax=255)
         plt.show()
         cv2.destroyAllWindows()
-        print('(ROT, TILT, X): ( ' + str(self.rot_index) + ', ' + str(self.tilt_index) + ', ' + str(self.x_index) + ')')
+        print('(ROT, TILT_X, TILT_Y, X, Y): (' + str(self.rot_index) + ', ' + str(self.x_tilt_index) + ', ' + str(self.y_tilt_index) + ', ' + str(self.x_index) + ', ' + str(self.y_index) + ')')
 
     def take_action(self, action):
 
         temp_x = int((self.x_index - 8)*(action == 1) + (self.x_index + 8)*(action == 2) + self.x_index*(action != 1 and action != 2))
-        temp_tilt = int((self.tilt_index - 2)*(action == 3) + (self.tilt_index + 2)*(action == 4) + self.tilt_index*(action != 3 and action != 4))
-        temp_rot = int((self.rot_index - 2)*(action == 5) + (self.rot_index + 2)*(action == 6) + self.rot_index*(action != 5 and action != 6))
+        temp_y = int((self.x_index - 8)*(action == 3) + (self.x_index + 8)*(action == 4) + self.x_index*(action != 3 and action != 4))
+        temp_x_tilt = int((self.tilt_index - 2)*(action == 5) + (self.tilt_index + 2)*(action == 6) + self.tilt_index*(action != 5 and action != 6))
+        temp_y_tilt = int((self.tilt_index - 2)*(action == 7) + (self.tilt_index + 2)*(action == 8) + self.tilt_index*(action != 7 and action != 8))
+        temp_rot = int((self.rot_index - 2)*(action == 9) + (self.rot_index + 2)*(action == 10) + self.rot_index*(action != 9 and action != 10))
 
         if temp_x < 0 or temp_x > (X_STATES - 1) or temp_tilt < 0 or temp_tilt > (TILT_STATES - 1) or\
                 temp_rot < 0 or temp_rot > (ROT_STATES - 1):
