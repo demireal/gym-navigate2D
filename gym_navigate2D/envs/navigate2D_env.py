@@ -13,9 +13,8 @@ PHI_MAX = 30
 X_STATES = 400
 Y_STATES = 400
 X_TILT_STATES = 101
-Y_TILT_STATES = 101
 ROT_STATES = 101
-NUM_OF_ACTIONS = 11
+NUM_OF_ACTIONS = 9
 
 IN_DIM = (1, 84, 84)
 MASK_FILE = '/content/drive/My Drive/UBC Research/mask.png'
@@ -25,7 +24,7 @@ class navigate2DEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
     def __init__(self, path, is_test=0, is_same=0):
-        self.state_array = np.load(path)
+        self.state_array = np.load(path)  # Convert .mat file to .npy !!
         self.state_array = self.state_array.transpose(0, 2, 1)  # Revise this part after having the method
         self.data = self.state_array
         self.is_test = is_test
@@ -39,7 +38,6 @@ class navigate2DEnv(gym.Env):
         self.x_index = random.randint(0, X_STATES - 1)
         self.y_index = random.randint(0, Y_STATES - 1)
         self.x_tilt_index = random.randint(0, X_TILT_STATES - 1)
-        self.y_tilt_index = random.randint(0, Y_TILT_STATES - 1)
         self.rot_index = random.randint(0, ROT_STATES - 1)
 
         self.mask = imageio.imread(MASK_FILE)[:, :, 1]
@@ -66,7 +64,6 @@ class navigate2DEnv(gym.Env):
         self.x_index = random.randint(0, X_STATES - 1)
         self.y_index = random.randint(0, Y_STATES - 1)
         self.x_tilt_index = random.randint(0, X_TILT_STATES - 1)
-        self.y_tilt_index = random.randint(0, Y_TILT_STATES - 1)
         self.rot_index = random.randint(0, ROT_STATES - 1)
 
         self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.tilt_index*2/(TILT_STATES - 1) - 1, self.x_index*2/(X_STATES - 1) - 1)  # Revise this part after having the method
@@ -79,33 +76,30 @@ class navigate2DEnv(gym.Env):
         plt.imshow(self.state, cmap='gray', vmin=0, vmax=255)
         plt.show()
         cv2.destroyAllWindows()
-        print('(ROT, TILT_X, TILT_Y, X, Y): (' + str(self.rot_index) + ', ' + str(self.x_tilt_index) + ', ' + str(self.y_tilt_index) + ', ' + str(self.x_index) + ', ' + str(self.y_index) + ')')
+        print('(ROT, TILT_X, X, Y): (' + str(self.rot_index) + ', ' + str(self.x_tilt_index) + ', ' + str(self.y_tilt_index) + ', ' + str(self.x_index) + ', ' + str(self.y_index) + ')')
 
     def take_action(self, action):
 
         temp_x = int((self.x_index - 8)*(action == 1) + (self.x_index + 8)*(action == 2) + self.x_index*(action != 1 and action != 2))
         temp_y = int((self.y_index - 8)*(action == 3) + (self.y_index + 8)*(action == 4) + self.y_index*(action != 3 and action != 4))
-        temp_x_tilt = int((self.x_tilt_index - 2)*(action == 5) + (self.x_tilt_index + 2)*(action == 6) + self.x_tilt_index*(action != 5 and action != 6))
-        temp_y_tilt = int((self.y_tilt_index - 2)*(action == 7) + (self.y_tilt_index + 2)*(action == 8) + self.y_tilt_index*(action != 7 and action != 8))
-        temp_rot = int((self.rot_index - 2)*(action == 9) + (self.rot_index + 2)*(action == 10) + self.rot_index*(action != 9 and action != 10))
+        temp_x_tilt = int((self.x_tilt_index - 2)*(action == 5) + (self.x_tilt_index + 2)*(action == 6) + self.x_tilt_index*(action != 5 and action != 6))      
+        temp_rot = int((self.rot_index - 2)*(action == 7) + (self.rot_index + 2)*(action == 8) + self.rot_index*(action != 7 and action != 8))
 
         if temp_x < 0 or temp_x > (X_STATES - 1) or temp_y < 0 or temp_y > (Y_STATES - 1) or\
                 temp_x_tilt < 0 or temp_x_tilt > (X_TILT_STATES - 1) or\
-                temp_y_tilt < 0 or temp_y_tilt > (Y_TILT_STATES - 1) or\
                 temp_rot < 0 or temp_rot > (ROT_STATES - 1):
             obs = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]  # Check here if method returns (H, W) format
             reward = -0.1
 
         # Check the target image intervals
         else:
-            reinf = np.abs(self.x_index - 199) + np.abs(self.y_index - 199) + np.abs(self.x_tilt_index - 50) + np.abs(self.y_tilt_index - 50) + np.abs(self.rot_index - 50)\
-                    > np.abs(temp_x - 199) + np.abs(temp_y - 199) + np.abs(temp_x_tilt - 50) + np.abs(temp_y_tilt - 50) + np.abs(temp_rot - 50)
+            reinf = np.abs(self.x_index - 199) + np.abs(self.y_index - 199) + np.abs(self.x_tilt_index - 50) + np.abs(self.rot_index - 50)\
+                    > np.abs(temp_x - 199) + np.abs(temp_y - 199) + np.abs(temp_x_tilt - 50) + np.abs(temp_rot - 50)
             self.x_index = temp_x
             self.y_index = temp_y
             self.x_tilt_index = temp_x_tilt
-            self.y_tilt_index = temp_y_tilt
             self.rot_index = temp_rot
-            self.flag = 195 < self.x_index < 204 and 195 < self.y_index < 204 and 48 < self.x_tilt_index < 51 and 48 < self.y_tilt_index < 51 and 48 < self.rot_index < 51
+            self.flag = 195 < self.x_index < 204 and 195 < self.y_index < 204 and 48 < self.x_tilt_index < 51 and 48 < self.rot_index < 51
             self.done = self.flag and action == 0
             self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.tilt_index*2/(TILT_STATES - 1) - 1, self.x_index*2/(X_STATES - 1) - 1)  #  New method
             obs = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]  # Again check if new method returns (H, W)
