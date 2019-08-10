@@ -17,8 +17,6 @@ Y_STATES = 201
 X_TILT_STATES = 101
 ROT_STATES = 101
 NUM_OF_ACTIONS = 9
-PATH  = '/content/drive/My Drive/UBC Research/Data/baby_data_ds/spliced_8x.mat'
-FNAME = 'spliced_8x'
 
 IN_DIM = (1, 84, 84)
 MASK_FILE = '/content/drive/My Drive/UBC Research/Data/mask.png'
@@ -27,8 +25,8 @@ INTERPOLATION = cv2.INTER_NEAREST
 class navigate2DEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
-    def __init__(self, is_test=0, is_same=0):
-        self.state_array = spi.loadmat(PATH)[FNAME]  
+    def __init__(self, path, fname, is_test=0, is_same=0):
+        self.state_array = spi.loadmat(path)[fname]  
         self.state_array = np.swapaxes(self.state_array, 1, 2)  
         self.data = self.state_array
         self.is_test = is_test
