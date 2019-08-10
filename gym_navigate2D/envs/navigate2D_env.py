@@ -9,11 +9,13 @@ from gym import spaces
 from matplotlib import pyplot as plt
 
 PHI_MAX = 30
+THETA_SCALE = 0.25
+XY_SCALE = 0.85
 MASKSIZE = 400
 
 # Set here manually.
 X_STATES = 401
-Y_STATES = 201
+Y_STATES = 401
 X_TILT_STATES = 101
 ROT_STATES = 101
 NUM_OF_ACTIONS = 9
@@ -66,7 +68,7 @@ class navigate2DEnv(gym.Env):
         self.x_tilt_index = random.randint(0, X_TILT_STATES - 1)
         self.rot_index = random.randint(0, ROT_STATES - 1)
 
-        self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.x_tilt_index*2/(X_TILT_STATES - 1) - 1, (self.x_index*2/(X_STATES - 1) - 1)*0.9, (self.y_index*2/(Y_STATES - 1) - 1)*0.9)
+        self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.x_tilt_index*2/(X_TILT_STATES - 1) - 1, self.x_index*2/(X_STATES - 1) - 1, self.y_index*2/(Y_STATES - 1) - 1)
         state = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)
         state = state[np.newaxis, :, :]
 
@@ -100,7 +102,7 @@ class navigate2DEnv(gym.Env):
             self.rot_index = temp_rot
             self.flag = 195 < self.x_index < 204 and 97 < self.y_index < 102 and 48 < self.x_tilt_index < 51 and 48 < self.rot_index < 51
             self.done = self.flag and action == 0
-            self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.x_tilt_index*2/(X_TILT_STATES - 1) - 1, (self.x_index*2/(X_STATES - 1) - 1)*0.9, (self.y_index*2/(Y_STATES - 1) - 1)*0.9)
+            self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.x_tilt_index*2/(X_TILT_STATES - 1) - 1, self.x_index*2/(X_STATES - 1) - 1, self.y_index*2/(Y_STATES - 1) - 1)
             obs = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]
             reward = 0.1*(1 - self.done)*(-1 + 2*reinf) + self.done
 
@@ -120,10 +122,10 @@ class navigate2DEnv(gym.Env):
         return h1, h2, z_min, z_max
 
     def get_slice(self, theta_n, phi_n, dx_n, dy_n):
-        theta = theta_n*math.pi
+        theta = theta_n*math.pi*THETA_SCALE
         phi = math.radians(phi_n*PHI_MAX)
-        dx = dx_n*self.x0/2 # +/- 200 pixels
-        dy = dy_n*self.y0/2 # +/- 350 pixels
+        dx = dx_n*XY_SCALE*self.x0/2 # +/- 200 pixels
+        dy = dy_n*XY_SCALE*self.y0/2 # +/- 350 pixels
 
         # --- 1: Get bounding box dims ---
         h1, h2, z_min, z_max = self.get_bounding_box(theta=theta, phi=phi, dx=dx, dy=dy)
