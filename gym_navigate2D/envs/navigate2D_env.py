@@ -68,7 +68,7 @@ class navigate2DEnv(gym.Env):
         self.x_tilt_index = random.randint(0, X_TILT_STATES - 1)
         self.rot_index = random.randint(0, ROT_STATES - 1)
 
-        self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.tilt_index*2/(TILT_STATES - 1) - 1, (self.x_index*2/(X_STATES - 1) - 1)*0.9, (self.y_index*2/(Y_STATES - 1) - 1)*0.9)
+        self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.x_tilt_index*2/(X_TILT_STATES - 1) - 1, (self.x_index*2/(X_STATES - 1) - 1)*0.9, (self.y_index*2/(Y_STATES - 1) - 1)*0.9)
         state = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)
         state = state[np.newaxis, :, :]
 
@@ -78,7 +78,7 @@ class navigate2DEnv(gym.Env):
         plt.imshow(self.state, cmap='gray', vmin=0, vmax=255)
         plt.show()
         cv2.destroyAllWindows()
-        print('(ROT, TILT_X, X, Y): (' + str(self.rot_index) + ', ' + str(self.x_tilt_index) + ', ' + str(self.y_tilt_index) + ', ' + str(self.x_index) + ', ' + str(self.y_index) + ')')
+        print('(ROT, TILT_X, X, Y): (' + str(self.rot_index) + ', ' + str(self.x_tilt_index) + ', ' + str(self.x_index) + ', ' + str(self.y_index) + ')')
 
     def take_action(self, action):
 
@@ -102,7 +102,7 @@ class navigate2DEnv(gym.Env):
             self.rot_index = temp_rot
             self.flag = 195 < self.x_index < 204 and 97 < self.y_index < 102 and 48 < self.x_tilt_index < 51 and 48 < self.rot_index < 51
             self.done = self.flag and action == 0
-            self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.tilt_index*2/(TILT_STATES - 1) - 1, (self.x_index*2/(X_STATES - 1) - 1)*0.9, (self.y_index*2/(Y_STATES - 1) - 1)*0.9)
+            self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.x_tilt_index*2/(X_TILT_STATES - 1) - 1, (self.x_index*2/(X_STATES - 1) - 1)*0.9, (self.y_index*2/(Y_STATES - 1) - 1)*0.9)
             obs = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]
             reward = 0.1*(1 - self.done)*(-1 + 2*reinf) + self.done
 
