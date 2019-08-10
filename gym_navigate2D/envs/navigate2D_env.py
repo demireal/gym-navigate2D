@@ -17,7 +17,7 @@ Y_STATES = 201
 X_TILT_STATES = 101
 ROT_STATES = 101
 NUM_OF_ACTIONS = 9
-PATH  = '/content/drive/My Drive/UBC Research/Data/baby_data/spliced_8x.mat'
+PATH  = '/content/drive/My Drive/UBC Research/Data/baby_data_ds/spliced_8x.mat'
 FNAME = 'spliced_8x'
 
 IN_DIM = (1, 84, 84)
