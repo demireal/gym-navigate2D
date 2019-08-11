@@ -20,7 +20,7 @@ X_TILT_STATES = 101
 ROT_STATES = 101
 NUM_OF_ACTIONS = 9
 
-IN_DIM = (1, 84, 84)
+IN_DIM = (1, 50, 50)
 MASK_FILE = '/content/drive/My Drive/UBC Research/Data/mask.png'
 INTERPOLATION = cv2.INTER_NEAREST
 
