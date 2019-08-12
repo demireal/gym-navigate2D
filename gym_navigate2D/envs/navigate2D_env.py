@@ -63,17 +63,10 @@ class navigate2DEnv(gym.Env):
         self.state_array = np.clip(self.state_array, 0, 255)
         self.state_array = np.array(self.state_array, np.uint8)
         
-        if self.nbEpisode < 50:
-            self.x_index = randint(0, X_STATES - 1)
-            self.y_index = randint(0, Y_STATES - 1)
-            self.x_tilt_index = randint(0, X_TILT_STATES - 1)
-            self.rot_index = randint(0, ROT_STATES - 1)
-
-        else:
-            self.x_index = randint(*choice([(0, (X_STATES - 1)/20), ((X_STATES - 1)/20, (X_STATES - 1) - (X_STATES - 1)/20), ((X_STATES - 1) - (X_STATES - 1)/20, (X_STATES - 1))]))
-            self.y_index = randint(*choice([(0, (Y_STATES - 1)/20), ((Y_STATES - 1)/20, (Y_STATES - 1) - (Y_STATES - 1)/20), ((Y_STATES - 1) - (Y_STATES - 1)/20, (Y_STATES - 1))]))
-            self.x_tilt_index = randint(*choice([(0, (X_TILT_STATES - 1)/20), ((X_TILT_STATES - 1)/20, (X_TILT_STATES - 1) - (X_TILT_STATES - 1)/20), ((X_TILT_STATES - 1) - (X_TILT_STATES - 1)/20, (X_TILT_STATES - 1))]))
-            self.rot_index = randint(*choice([(0, (ROT_STATES - 1)/20), ((ROT_STATES - 1)/20, (ROT_STATES - 1) - (ROT_STATES - 1)/20), ((ROT_STATES - 1) - (ROT_STATES - 1)/20, (ROT_STATES - 1))]))
+        self.x_index = randint(*choice([(0, (X_STATES - 1)/20), ((X_STATES - 1)/20, (X_STATES - 1) - (X_STATES - 1)/20), ((X_STATES - 1) - (X_STATES - 1)/20, (X_STATES - 1))]))
+        self.y_index = randint(*choice([(0, (Y_STATES - 1)/20), ((Y_STATES - 1)/20, (Y_STATES - 1) - (Y_STATES - 1)/20), ((Y_STATES - 1) - (Y_STATES - 1)/20, (Y_STATES - 1))]))
+        self.x_tilt_index = randint(*choice([(0, (X_TILT_STATES - 1)/20), ((X_TILT_STATES - 1)/20, (X_TILT_STATES - 1) - (X_TILT_STATES - 1)/20), ((X_TILT_STATES - 1) - (X_TILT_STATES - 1)/20, (X_TILT_STATES - 1))]))
+        self.rot_index = randint(*choice([(0, (ROT_STATES - 1)/20), ((ROT_STATES - 1)/20, (ROT_STATES - 1) - (ROT_STATES - 1)/20), ((ROT_STATES - 1) - (ROT_STATES - 1)/20, (ROT_STATES - 1))]))
 
         self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.x_tilt_index*2/(X_TILT_STATES - 1) - 1, self.x_index*2/(X_STATES - 1) - 1, self.y_index*2/(Y_STATES - 1) - 1)
         state = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)
