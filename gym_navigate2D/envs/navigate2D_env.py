@@ -101,7 +101,7 @@ class navigate2DEnv(gym.Env):
             reward = -0.1
 
         else:
-            reinf1 = np.abs(self.x_index - 60) + np.abs(self.y_index - 54) + np.abs(self.x_tilt_index - 50) + np.abs(self.rot_index - 50)\
+            reinf = np.abs(self.x_index - 60) + np.abs(self.y_index - 54) + np.abs(self.x_tilt_index - 50) + np.abs(self.rot_index - 50)\
                     > np.abs(temp_x - 60) + np.abs(temp_y - 54) + np.abs(temp_x_tilt - 50) + np.abs(temp_rot - 50)
             self.x_index = temp_x
             self.y_index = temp_y
