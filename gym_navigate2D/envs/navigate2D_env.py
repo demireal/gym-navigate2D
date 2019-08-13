@@ -71,7 +71,7 @@ class navigate2DEnv(gym.Env):
             self.rot_index = randint(0, ROT_STATES - 1)
         
         else:
-            self.x_index = randint(*choice([(0, 5), (6 113), (114, 119)]))
+            self.x_index = randint(*choice([(0, 5), (6, 113), (114, 119)]))
             self.y_index = randint(*choice([(0, 4), (5, 102), (103, 107)]))
             self.x_tilt_index = randint(*choice([(0, 4), (5, 95), (96, 100)]))
             self.rot_index = randint(*choice([(0, 4), (5, 95), (96, 100)]))
