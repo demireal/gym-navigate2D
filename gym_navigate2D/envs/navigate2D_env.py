@@ -64,7 +64,7 @@ class navigate2DEnv(gym.Env):
         self.flag = False
         self.done = False
         
-        if self.nbEspisode < 1000:
+        if self.nbEpisode < 1000:
             self.x_index = randint(0, X_STATES - 1)
             self.y_index = randint(0, Y_STATES - 1)
             self.x_tilt_index = randint(0, X_TILT_STATES - 1)
