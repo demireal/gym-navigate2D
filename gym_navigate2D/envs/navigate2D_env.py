@@ -32,6 +32,7 @@ class navigate2DEnv(gym.Env):
 
     def __init__(self, is_test=0):
         self.data = spi.loadmat(INFILE)['spliced_'+str(DOWNSIZE_FACTOR)+'x']
+        self.data = np.flip(self.data, axis=1)
         self.data_orig = self.data
         
         self.mask_size = int(MASKSIZE / DOWNSIZE_FACTOR)
