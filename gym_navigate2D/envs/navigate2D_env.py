@@ -9,33 +9,40 @@ from matplotlib import pyplot as plt
 from random import randint, choice
 
 PHI_MAX = 30
-THETA_SCALE = 0.15
-XY_SCALE = 0.85
+THETA_SCALE = 0.25
+X_SCALE = 0.8
+Y_SCALE = 0.8
 MASKSIZE = 400
+DOWNSIZE_FACTOR = 4     # must either be 2, 4 or 8
 
 # Set here manually.
-X_STATES = 201
-Y_STATES = 201
+X_STATES = 160
+Y_STATES = 144
 X_TILT_STATES = 101
 ROT_STATES = 101
 NUM_OF_ACTIONS = 9
 
 IN_DIM = (1, 50, 50)
-MASK_FILE = '/content/drive/My Drive/UBC Research/Data/mask.png'
+INFILE = '/content/drive/My Drive/UBC Research/Data/baby_data/downsized_mats_zeroed.mat'
+MASKFOLDER = '/content/drive/My Drive/UBC Research/Data/baby_data'
 INTERPOLATION = cv2.INTER_NEAREST
 
 class navigate2DEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
-    def __init__(self, path, fname, is_test=0, is_same=0):
-        self.state_array = spi.loadmat(path)[fname]  
-        self.state_array = np.swapaxes(self.state_array, 1, 2)  
-        self.data = self.state_array
-        self.is_test = is_test
-        self.is_same = is_same
-        self.nbEpisode = 1
-        self.action_space = spaces.Discrete(NUM_OF_ACTIONS)
-        self.observation_space = spaces.Box(low=0, high=255, shape=IN_DIM, dtype='uint8')
+    def __init__(self, is_test=0):
+        self.data = spi.loadmat(INFILE)['spliced_'+str(DOWNSIZE_FACTOR)+'x']
+        self.data = np.swapaxes(self.data, 1, 2)  
+        
+        self.mask_size = int(MASKSIZE / DOWNSIZE_FACTOR)
+        self.mask = imageio.imread(MASKFOLDER+'/mask_'+str(DOWNSIZE_FACTOR)+'x.png')[:,:,1]
+        self.mask = np.uint8(self.mask/255)
+         
+        dims = self.data.shape
+        self.x0 = dims[0]
+        self.y0 = dims[1]
+        self.z0 = dims[2]
+        
         self.flag = False
         self.done = False
         self.state = None
@@ -43,14 +50,11 @@ class navigate2DEnv(gym.Env):
         self.y_index = randint(0, Y_STATES - 1)
         self.x_tilt_index = randint(0, X_TILT_STATES - 1)
         self.rot_index = randint(0, ROT_STATES - 1)
-
-        self.mask = imageio.imread(MASK_FILE)[:, :, 1]
-        self.mask = np.uint8(self.mask/255)
-         
-        dims = self.state_array.shape
-        self.x0 = dims[0]
-        self.y0 = dims[1]
-        self.z0 = dims[2]
+        
+        self.action_space = spaces.Discrete(NUM_OF_ACTIONS)
+        self.observation_space = spaces.Box(low=0, high=255, shape=IN_DIM, dtype='uint8')
+        self.is_test = is_test
+        self.nbEpisode = 1
 
     def step(self, action):
         state, reward = self.take_action(action)
@@ -59,19 +63,15 @@ class navigate2DEnv(gym.Env):
     def reset(self):
         self.flag = False
         self.done = False
-        self.state_array = self.data 
-        self.state_array = np.clip(self.state_array, 0, 255)
-        self.state_array = np.array(self.state_array, np.uint8)
         
-        self.x_index = randint(*choice([(0, (X_STATES - 1)/20), ((X_STATES - 1)/20, (X_STATES - 1) - (X_STATES - 1)/20), ((X_STATES - 1) - (X_STATES - 1)/20, (X_STATES - 1))]))
-        self.y_index = randint(*choice([(0, (Y_STATES - 1)/20), ((Y_STATES - 1)/20, (Y_STATES - 1) - (Y_STATES - 1)/20), ((Y_STATES - 1) - (Y_STATES - 1)/20, (Y_STATES - 1))]))
-        self.x_tilt_index = randint(*choice([(0, (X_TILT_STATES - 1)/20), ((X_TILT_STATES - 1)/20, (X_TILT_STATES - 1) - (X_TILT_STATES - 1)/20), ((X_TILT_STATES - 1) - (X_TILT_STATES - 1)/20, (X_TILT_STATES - 1))]))
-        self.rot_index = randint(*choice([(0, (ROT_STATES - 1)/20), ((ROT_STATES - 1)/20, (ROT_STATES - 1) - (ROT_STATES - 1)/20), ((ROT_STATES - 1) - (ROT_STATES - 1)/20, (ROT_STATES - 1))]))
+        self.x_index = randint(*choice([(0, 8), (9, 150), (151, 159)]))
+        self.y_index = randint(*choice([(0, 6), (7, 136), (137, 143)]))
+        self.x_tilt_index = randint(*choice([(0, 4), (5, 95), (96, 100)]))
+        self.rot_index = randint(*choice([(0, 4), (5, 95), (96, 100)]))
 
         self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.x_tilt_index*2/(X_TILT_STATES - 1) - 1, self.x_index*2/(X_STATES - 1) - 1, self.y_index*2/(Y_STATES - 1) - 1)
         state = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)
         state = state[np.newaxis, :, :]
-
         return state
 
     def render(self, mode='human'):
@@ -94,13 +94,13 @@ class navigate2DEnv(gym.Env):
             reward = -0.1
 
         else:
-            reinf = np.abs(self.x_index - 100) + np.abs(self.y_index - 100) + np.abs(self.x_tilt_index - 50) + np.abs(self.rot_index - 50)\
-                    > np.abs(temp_x - 100) + np.abs(temp_y - 100) + np.abs(temp_x_tilt - 50) + np.abs(temp_rot - 50)
+            reinf = np.abs(self.x_index - 80) + np.abs(self.y_index - 72) + np.abs(self.x_tilt_index - 50) + np.abs(self.rot_index - 50)\
+                    > np.abs(temp_x - 80) + np.abs(temp_y - 72) + np.abs(temp_x_tilt - 50) + np.abs(temp_rot - 50)
             self.x_index = temp_x
             self.y_index = temp_y
             self.x_tilt_index = temp_x_tilt
             self.rot_index = temp_rot
-            self.flag = 97 < self.x_index < 103 and 97 < self.y_index < 103 and 48 < self.x_tilt_index < 52 and 48 < self.rot_index < 52
+            self.flag = 77 < self.x_index < 83 and  69 < self.y_index < 75 and 48 < self.x_tilt_index < 52 and 48 < self.rot_index < 52
             self.done = self.flag and action == 0
             self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.x_tilt_index*2/(X_TILT_STATES - 1) - 1, self.x_index*2/(X_STATES - 1) - 1, self.y_index*2/(Y_STATES - 1) - 1)
             obs = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]
@@ -111,26 +111,28 @@ class navigate2DEnv(gym.Env):
         return obs, reward
     
     def get_bounding_box(self, theta, phi, dx, dy):
-        h1 = [self.x0 / 2 + self.y0 / 2 * math.sin(theta) + dx,#+ dist,##*math.cos(theta),
-              self.y0 / 2 - self.y0 / 2 * math.cos(theta) + dy]## + dist*math.sin(theta)]
+        #print('theta:',theta,'\tphi:',phi,'\tdx:',dx,'\tdy:',dy)
+        h1 = [self.x0 / 2 + self.mask_size / 2 * math.sin(theta) + dx,#+ dist,##*math.cos(theta),
+              self.y0 / 2 + self.mask_size / 2 * math.cos(theta) + dy]## + dist*math.sin(theta)]
 
-        h2 = [self.x0 / 2 - self.y0 / 2 * math.sin(theta) + dx,#dist,##*math.cos(theta),
-              self.y0 / 2 + self.y0 / 2 * math.cos(theta) + dy]## + dist*math.sin(theta)]
+        h2 = [self.x0 / 2 - self.mask_size / 2 * math.sin(theta) + dx,#dist,##*math.cos(theta),
+              self.y0 / 2 - self.mask_size / 2 * math.cos(theta) + dy]## + dist*math.sin(theta)]
 
         z_min = 0 #self.z0 / 2 - self.z0 / 2 * math.cos(phi)
         z_max = self.z0 * math.cos(phi) #self.z0 / 2 + self.z0 / 2 * math.cos(phi)
+        #print('h1:',h1,'\th2:',h2,'\tz_min:', z_min,'\tz_max:', z_max)
         return h1, h2, z_min, z_max
 
     def get_slice(self, theta_n, phi_n, dx_n, dy_n):
         theta = theta_n*math.pi*THETA_SCALE
         phi = math.radians(phi_n*PHI_MAX)
-        dx = dx_n*XY_SCALE*self.x0/2 # +/- 200 pixels
-        dy = dy_n*XY_SCALE*self.y0/2 # +/- 350 pixels
+        dx = X_SCALE*dx_n*self.x0/2  # +/- 200 pixels
+        dy = Y_SCALE*dy_n*self.y0/2  # +/- 350 pixels
 
         # --- 1: Get bounding box dims ---
         h1, h2, z_min, z_max = self.get_bounding_box(theta=theta, phi=phi, dx=dx, dy=dy)
-        w = MASKSIZE
-        h = MASKSIZE
+        w = self.mask_size
+        h = self.mask_size
 
         # --- 2: Extract slice from volume ---
         # Get x_i and y_i for current layer
@@ -156,7 +158,7 @@ class navigate2DEnv(gym.Env):
         flat_inds = np.ravel_multi_index((x_i, y_i, z_i), (self.x0, self.y0, self.z0), mode='clip')
 
         # Fill in entire slice at once
-        the_slice = np.take(self.state_array, flat_inds)
+        the_slice = np.take(self.data, flat_inds)
 
         # --- 3: Mask slice ---
         the_slice = np.multiply(the_slice, self.mask)
