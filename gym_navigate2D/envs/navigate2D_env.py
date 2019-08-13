@@ -25,7 +25,7 @@ NUM_OF_ACTIONS = 9
 IN_DIM = (1, 84, 84)
 INFILE = '/content/drive/My Drive/UBC Research/Data/baby_data/downsized_mats_zeroed.mat'
 MASKFOLDER = '/content/drive/My Drive/UBC Research/Data/baby_data'
-INTERPOLATION = cv2.INTER_NEAREST
+INTERPOLATION = cv2.INTER_CUBIC
 
 class navigate2DEnv(gym.Env):
     metadata = {'render.modes': ['human']}
