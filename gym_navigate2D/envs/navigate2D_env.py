@@ -6,7 +6,7 @@ import imageio
 import scipy.io as spi
 from gym import spaces
 from matplotlib import pyplot as plt
-from random import randint, choice
+from random import randint, choice, randn
 
 PHI_MAX = 30
 THETA_SCALE = 0.25
@@ -32,7 +32,8 @@ class navigate2DEnv(gym.Env):
 
     def __init__(self, is_test=0):
         self.data = spi.loadmat(INFILE)['spliced_'+str(DOWNSIZE_FACTOR)+'x']
-        self.data = np.swapaxes(self.data, 1, 2)  
+        self.data = np.swapaxes(self.data, 1, 2)
+        self.data_orig = self.data
         
         self.mask_size = int(MASKSIZE / DOWNSIZE_FACTOR)
         self.mask = imageio.imread(MASKFOLDER+'/mask_'+str(DOWNSIZE_FACTOR)+'x.png')[:,:,1]
@@ -63,6 +64,7 @@ class navigate2DEnv(gym.Env):
     def reset(self):
         self.flag = False
         self.done = False
+        self.data = self.data_orig + randint(0, 20)*randn((self.x0, self.y0, self.z0))
         
         if self.nbEpisode < 1000:
             self.x_index = randint(0, X_STATES - 1)
