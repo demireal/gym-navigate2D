@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 from random import randint, choice
 
 PHI_MAX = 30
-THETA_SCALE = 0.25
+THETA_MAX = 45
 X_SCALE = 0.5
 Y_SCALE = 0.5
 MASKSIZE = 400
@@ -23,7 +23,7 @@ ROT_STATES = 101
 NUM_OF_ACTIONS = 9
 
 IN_DIM = (1, 84, 84)
-INFILE = '/content/drive/My Drive/UBC Research/Data/baby_data/downsized_mats_zeroed.mat'
+INFILE = '/content/drive/My Drive/UBC Research/Data/baby_data/downsized_mats2_zeroed.mat'
 MASKFOLDER = '/content/drive/My Drive/UBC Research/Data/baby_data'
 INTERPOLATION = cv2.INTER_NEAREST
 
@@ -32,7 +32,6 @@ class navigate2DEnv(gym.Env):
 
     def __init__(self, is_test=0):
         self.data = spi.loadmat(INFILE)['spliced_'+str(DOWNSIZE_FACTOR)+'x']
-        self.data = np.swapaxes(self.data, 1, 2)
         self.data_orig = self.data
         
         self.mask_size = int(MASKSIZE / DOWNSIZE_FACTOR)
@@ -121,10 +120,10 @@ class navigate2DEnv(gym.Env):
     
     def get_bounding_box(self, theta, phi, dx, dy):
         #print('theta:',theta,'\tphi:',phi,'\tdx:',dx,'\tdy:',dy)
-        h1 = [self.x0 / 2 + self.mask_size / 2 * math.sin(theta) + dx,#+ dist,##*math.cos(theta),
+        h1 = [self.x0 / 2 - self.mask_size / 2 * math.sin(theta) + dx,#+ dist,##*math.cos(theta),
               self.y0 / 2 + self.mask_size / 2 * math.cos(theta) + dy]## + dist*math.sin(theta)]
 
-        h2 = [self.x0 / 2 - self.mask_size / 2 * math.sin(theta) + dx,#dist,##*math.cos(theta),
+        h2 = [self.x0 / 2 + self.mask_size / 2 * math.sin(theta) + dx,#dist,##*math.cos(theta),
               self.y0 / 2 - self.mask_size / 2 * math.cos(theta) + dy]## + dist*math.sin(theta)]
 
         z_min = 0 #self.z0 / 2 - self.z0 / 2 * math.cos(phi)
@@ -133,7 +132,7 @@ class navigate2DEnv(gym.Env):
         return h1, h2, z_min, z_max
 
     def get_slice(self, theta_n, phi_n, dx_n, dy_n):
-        theta = theta_n*math.pi*THETA_SCALE
+        theta = math.radians(theta_n*THETA_MAX)
         phi = math.radians(phi_n*PHI_MAX)
         dx = X_SCALE*dx_n*self.x0/2  # +/- 200 pixels
         dy = Y_SCALE*dy_n*self.y0/2  # +/- 350 pixels
@@ -145,7 +144,6 @@ class navigate2DEnv(gym.Env):
 
         # --- 2: Extract slice from volume ---
         # Get x_i and y_i for current layer
-        # TODO: check that replacing h with zmax is correct
         x_offsets = np.linspace(z_min, z_max, h) * math.sin(phi) * math.cos(theta) #np.linspace(-h/2, h/2, h) * math.sin(phi) * math.cos(theta)
         y_offsets = np.linspace(z_min, z_max, h) * math.sin(phi) * math.sin(theta) #np.linspace(-h/2, h/2, h) * math.sin(phi) * math.sin(theta)
 
