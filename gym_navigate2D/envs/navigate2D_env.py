@@ -6,7 +6,7 @@ import imageio
 import scipy.io as spi
 from gym import spaces
 from matplotlib import pyplot as plt
-from random import randint, choice, randn
+from random import randint, choice
 
 PHI_MAX = 30
 THETA_SCALE = 0.25
@@ -64,7 +64,7 @@ class navigate2DEnv(gym.Env):
     def reset(self):
         self.flag = False
         self.done = False
-        self.data = self.data_orig + randint(0, 20)*randn((self.x0, self.y0, self.z0))
+        self.data = self.data_orig + randint(0, 20)*np.random.randn(self.x0, self.y0, self.z0)
         
         if self.nbEpisode < 1000:
             self.x_index = randint(0, X_STATES - 1)
