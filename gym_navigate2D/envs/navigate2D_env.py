@@ -30,7 +30,7 @@ INTERPOLATION = cv2.INTER_NEAREST
 class navigate2DEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
-    def __init__(self, is_test=0):
+    def __init__(self):
         self.data = spi.loadmat(INFILE)['spliced_'+str(DOWNSIZE_FACTOR)+'x']
         self.data = np.flip(self.data, axis=1)
         self.data_orig = self.data
@@ -54,7 +54,6 @@ class navigate2DEnv(gym.Env):
         
         self.action_space = spaces.Discrete(NUM_OF_ACTIONS)
         self.observation_space = spaces.Box(low=0, high=255, shape=IN_DIM, dtype='uint8')
-        self.is_test = is_test
         self.nbEpisode = 1
 
     def step(self, action, update):
