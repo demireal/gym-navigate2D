@@ -86,7 +86,6 @@ class navigate2DEnv(gym.Env):
         return state
 
     def render(self, mode='human'):
-        self.state = self.get_slice(0,0,0,0)
         plt.imshow(self.state, cmap='gray', vmin=0, vmax=255)
         plt.show()
         cv2.destroyAllWindows()
