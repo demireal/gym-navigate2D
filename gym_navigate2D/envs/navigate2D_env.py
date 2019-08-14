@@ -56,8 +56,8 @@ class navigate2DEnv(gym.Env):
         self.observation_space = spaces.Box(low=0, high=255, shape=IN_DIM, dtype='uint8')
         self.nbEpisode = 1
 
-    def step(self, action, update):
-        state, reward = self.take_action(action, update)
+    def step(self, action):
+        state, reward = self.take_action(action)
         return state, reward, self.done, {}
 
     def reset(self):
@@ -90,7 +90,7 @@ class navigate2DEnv(gym.Env):
         cv2.destroyAllWindows()
         print('(ROT, TILT_X, X, Y): (' + str(self.rot_index) + ', ' + str(self.x_tilt_index) + ', ' + str(self.x_index) + ', ' + str(self.y_index) + ')')
 
-    def take_action(self, action, update):
+    def take_action(self, action):
 
         temp_x = int((self.x_index - 2)*(action == 1) + (self.x_index + 2)*(action == 2) + self.x_index*(action != 1 and action != 2))
         temp_y = int((self.y_index - 2)*(action == 3) + (self.y_index + 2)*(action == 4) + self.y_index*(action != 3 and action != 4))
@@ -107,16 +107,16 @@ class navigate2DEnv(gym.Env):
             reinf = np.abs(self.x_index - 50) + np.abs(self.y_index - 45) + np.abs(self.x_tilt_index - 50) + np.abs(self.rot_index - 50)\
                     > np.abs(temp_x - 50) + np.abs(temp_y - 45) + np.abs(temp_x_tilt - 50) + np.abs(temp_rot - 50)
             
-            self.flag = 48 < temp_x < 52 and  43 < temp_y < 47 and 48 < temp_x_tilt < 52 and 48 < temp_rot < 52
+            self.x_index = temp_x
+            self.y_index = temp_y
+            self.x_tilt_index = temp_x_tilt
+            self.rot_index = temp_rot
+            
+            self.flag = 48 < self.x_index < 52 and  43 < self.y_index < 47 and 48 < self.x_tilt_index < 52 and 48 < self.rot_index < 52
             self.done = self.flag and action == 0
-            self.state = self.get_slice(temp_rot*2/(ROT_STATES - 1) - 1, temp_x_tilt*2/(X_TILT_STATES - 1) - 1, temp_x*2/(X_STATES - 1) - 1, temp_y*2/(Y_STATES - 1) - 1)
+            self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.x_tilt_index*2/(X_TILT_STATES - 1) - 1, self.x_index*2/(X_STATES - 1) - 1, self.y_index*2/(Y_STATES - 1) - 1)
             obs = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]
             reward = 0.1*(1 - self.done)*(-1 + 2*reinf) + self.done
-            if update == 1:
-                self.x_index = temp_x
-                self.y_index = temp_y
-                self.x_tilt_index = temp_x_tilt
-                self.rot_index = temp_rot
 
         self.nbEpisode = self.nbEpisode + 1*self.done
         return obs, reward
