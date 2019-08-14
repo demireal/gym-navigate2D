@@ -64,7 +64,9 @@ class navigate2DEnv(gym.Env):
     def reset(self):
         self.flag = False
         self.done = False
-        self.data = self.data_orig + randint(0, 20)*np.random.randn(self.x0, self.y0, self.z0)
+        self.data = self.data_orig + randint(0, 10)*np.random.randn(self.x0, self.y0, self.z0)
+        self.data = np.clip(self.data, 0, 255)
+        self.data = np.array(self.data, np.uint8)
         
         if self.nbEpisode < 1000:
             self.x_index = randint(0, X_STATES - 1)
@@ -73,10 +75,10 @@ class navigate2DEnv(gym.Env):
             self.rot_index = randint(0, ROT_STATES - 1)
         
         else:
-            self.x_index = randint(*choice([(0, 5), (6, 113), (114, 119)]))
-            self.y_index = randint(*choice([(0, 4), (5, 102), (103, 107)]))
-            self.x_tilt_index = randint(*choice([(0, 4), (5, 95), (96, 100)]))
-            self.rot_index = randint(*choice([(0, 4), (5, 95), (96, 100)]))
+            self.x_index = randint(*choice([(0, 4), (5, 50), (51, 95), (96, 100)]))
+            self.y_index = randint(*choice([(0, 4), (5, 45), (46, 85), (86, 90)]))
+            self.x_tilt_index = randint(*choice([(0, 4), (5, 50), (51, 95), (96, 100)]))
+            self.rot_index = randint(*choice([(0, 4), (5, 50), (51, 95), (96, 100)]))
 
         self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.x_tilt_index*2/(X_TILT_STATES - 1) - 1, self.x_index*2/(X_STATES - 1) - 1, self.y_index*2/(Y_STATES - 1) - 1)
         state = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)
@@ -84,6 +86,7 @@ class navigate2DEnv(gym.Env):
         return state
 
     def render(self, mode='human'):
+        self.state = self.get_slice(0,0,0,0)
         plt.imshow(self.state, cmap='gray', vmin=0, vmax=255)
         plt.show()
         cv2.destroyAllWindows()
@@ -171,4 +174,5 @@ class navigate2DEnv(gym.Env):
         # --- 3: Mask slice ---
         the_slice = np.multiply(the_slice, self.mask)
         return the_slice
+
 
