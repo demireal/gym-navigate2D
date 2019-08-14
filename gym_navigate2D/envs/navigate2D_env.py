@@ -22,7 +22,7 @@ X_TILT_STATES = 101
 ROT_STATES = 101
 NUM_OF_ACTIONS = 9
 
-IN_DIM = (1, 50, 50)
+IN_DIM = (1, 84, 84)
 INFILE = '/content/drive/My Drive/UBC Research/Data/baby_data/downsized_mats2_zeroed.mat'
 MASKFOLDER = '/content/drive/My Drive/UBC Research/Data/baby_data'
 INTERPOLATION = cv2.INTER_NEAREST
