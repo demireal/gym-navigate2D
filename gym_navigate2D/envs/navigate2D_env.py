@@ -116,10 +116,13 @@ class navigate2DEnv(gym.Env):
         self.nbEpisode = self.nbEpisode + 1*self.done
         
         if update == 1:
+            print("YES")
             self.x_index = temp_x
             self.y_index = temp_y
             self.x_tilt_index = temp_x_tilt
             self.rot_index = temp_rot
+        else:
+            print("NO")
 
         return obs, reward
 
