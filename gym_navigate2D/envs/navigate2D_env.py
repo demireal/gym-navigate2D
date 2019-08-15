@@ -24,6 +24,7 @@ NUM_OF_ACTIONS = 9
 
 INFILE = '/content/drive/My Drive/UBC Research/Data/baby_data/downsized_mats2_zeroed.mat'
 MASKFOLDER = '/content/drive/My Drive/UBC Research/Data/baby_data'
+MASKFOLDER_2 = '/content/drive/My Drive/UBC Research/Data/new_mask_100.png'
 INTERPOLATION = cv2.INTER_NEAREST
 
 class navigate2DEnv(gym.Env):
@@ -35,7 +36,8 @@ class navigate2DEnv(gym.Env):
         self.data_orig = self.data
         
         self.mask_size = int(MASKSIZE / DOWNSIZE_FACTOR)
-        self.mask = imageio.imread(MASKFOLDER+'/mask_'+str(DOWNSIZE_FACTOR)+'x.png')[:,:,1]
+        #self.mask = imageio.imread(MASKFOLDER+'/mask_'+str(DOWNSIZE_FACTOR)+'x.png')[:,:,1]
+        self.mask = imageio.imread(MASKFOLDER_2)[:,:,1]
         self.mask = np.uint8(self.mask/255)
          
         dims = self.data.shape
