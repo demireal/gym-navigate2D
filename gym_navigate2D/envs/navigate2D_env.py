@@ -22,7 +22,6 @@ X_TILT_STATES = 201
 ROT_STATES = 201
 NUM_OF_ACTIONS = 9
 
-IN_DIM = (1, 84, 84)
 INFILE = '/content/drive/My Drive/UBC Research/Data/baby_data/downsized_mats2_zeroed.mat'
 MASKFOLDER = '/content/drive/My Drive/UBC Research/Data/baby_data'
 INTERPOLATION = cv2.INTER_NEAREST
@@ -30,7 +29,7 @@ INTERPOLATION = cv2.INTER_NEAREST
 class navigate2DEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
-    def __init__(self):
+    def __init__(self, IN_DIM):
         self.data = spi.loadmat(INFILE)['spliced_'+str(DOWNSIZE_FACTOR)+'x']
         self.data = np.flip(self.data, axis=1)
         self.data_orig = self.data
@@ -52,8 +51,9 @@ class navigate2DEnv(gym.Env):
         self.x_tilt_index = randint(0, X_TILT_STATES - 1)
         self.rot_index = randint(0, ROT_STATES - 1)
         
+        self.IN_DIM = IN_DIM
         self.action_space = spaces.Discrete(NUM_OF_ACTIONS)
-        self.observation_space = spaces.Box(low=0, high=255, shape=IN_DIM, dtype='uint8')
+        self.observation_space = spaces.Box(low=0, high=255, shape=self.IN_DIM, dtype='uint8')
         self.nbEpisode = 1
 
     def step(self, action, update):
@@ -80,7 +80,7 @@ class navigate2DEnv(gym.Env):
             self.rot_index = randint(*choice([(0, 8), (9, 100), (101, 191), (192, 200)]))
 
         self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.x_tilt_index*2/(X_TILT_STATES - 1) - 1, self.x_index*2/(X_STATES - 1) - 1, self.y_index*2/(Y_STATES - 1) - 1)
-        state = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)
+        state = cv2.resize(self.state, dsize=(self.IN_DIM[1], self.IN_DIM[2]), interpolation=INTERPOLATION)
         state = state[np.newaxis, :, :]
         return state
 
@@ -100,7 +100,7 @@ class navigate2DEnv(gym.Env):
         if temp_x < 0 or temp_x > (X_STATES - 1) or temp_y < 0 or temp_y > (Y_STATES - 1) or\
                 temp_x_tilt < 0 or temp_x_tilt > (X_TILT_STATES - 1) or\
                 temp_rot < 0 or temp_rot > (ROT_STATES - 1):
-            obs = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]
+            obs = cv2.resize(self.state, dsize=(self.IN_DIM[1], self.IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]
             reward = -0.1
 
         else:
@@ -110,7 +110,7 @@ class navigate2DEnv(gym.Env):
             self.flag = 48 < temp_x < 52 and  43 < temp_y < 47 and 98 < temp_x_tilt < 102 and 98 < temp_rot < 102
             self.done = self.flag and action == 0
             self.state = self.get_slice(temp_rot*2/(ROT_STATES - 1) - 1, temp_x_tilt*2/(X_TILT_STATES - 1) - 1, temp_x*2/(X_STATES - 1) - 1, temp_y*2/(Y_STATES - 1) - 1)
-            obs = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]
+            obs = cv2.resize(self.state, dsize=(self.IN_DIM[1], self.IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]
             reward = 0.1*(1 - self.done)*(-1 + 2*reinf) + self.done
             if update == 1:
                 self.x_index = temp_x
