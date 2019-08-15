@@ -94,8 +94,8 @@ class navigate2DEnv(gym.Env):
 
         temp_x = int((self.x_index - 2)*(action == 1) + (self.x_index + 2)*(action == 2) + self.x_index*(action != 1 and action != 2))
         temp_y = int((self.y_index - 2)*(action == 3) + (self.y_index + 2)*(action == 4) + self.y_index*(action != 3 and action != 4))
-        temp_x_tilt = int((self.x_tilt_index - 8)*(action == 5) + (self.x_tilt_index + 8)*(action == 6) + self.x_tilt_index*(action != 5 and action != 6))      
-        temp_rot = int((self.rot_index - 8)*(action == 7) + (self.rot_index + 8)*(action == 8) + self.rot_index*(action != 7 and action != 8))
+        temp_x_tilt = int((self.x_tilt_index - 4)*(action == 5) + (self.x_tilt_index + 4)*(action == 6) + self.x_tilt_index*(action != 5 and action != 6))      
+        temp_rot = int((self.rot_index - 4)*(action == 7) + (self.rot_index + 4)*(action == 8) + self.rot_index*(action != 7 and action != 8))
 
         if temp_x < 0 or temp_x > (X_STATES - 1) or temp_y < 0 or temp_y > (Y_STATES - 1) or\
                 temp_x_tilt < 0 or temp_x_tilt > (X_TILT_STATES - 1) or\
@@ -107,7 +107,7 @@ class navigate2DEnv(gym.Env):
             reinf = np.abs(self.x_index - 50) + np.abs(self.y_index - 45) + np.abs(self.x_tilt_index - 200) + np.abs(self.rot_index - 200)\
                     > np.abs(temp_x - 50) + np.abs(temp_y - 45) + np.abs(temp_x_tilt - 200) + np.abs(temp_rot - 200)
   
-            self.flag = 48 < temp_x < 52 and  43 < temp_y < 47 and 194 < temp_x_tilt < 206 and 194 < temp_rot < 206
+            self.flag = 48 < temp_x < 52 and  43 < temp_y < 47 and 196 < temp_x_tilt < 204 and 196 < temp_rot < 204
             self.done = self.flag and action == 0
             self.state = self.get_slice(temp_rot*2/(ROT_STATES - 1) - 1, temp_x_tilt*2/(X_TILT_STATES - 1) - 1, temp_x*2/(X_STATES - 1) - 1, temp_y*2/(Y_STATES - 1) - 1)
             obs = cv2.resize(self.state, dsize=(IN_DIM[1], IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]
