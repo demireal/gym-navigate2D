@@ -69,10 +69,10 @@ class navigate2DEnv(gym.Env):
         self.data = np.array(self.data, np.uint8)
         
         if self.nbEpisode < 1000 and self.is_same == 0:
-        self.x_index = randint(0, X_STATES - 1)
-        self.y_index = randint(0, Y_STATES - 1)
-        self.x_tilt_index = randint(0, X_TILT_STATES - 1)
-        self.rot_index = randint(0, ROT_STATES - 1)
+            self.x_index = randint(0, X_STATES - 1)
+            self.y_index = randint(0, Y_STATES - 1)
+            self.x_tilt_index = randint(0, X_TILT_STATES - 1)
+            self.rot_index = randint(0, ROT_STATES - 1)
         
         else:
             self.x_index = randint(*choice([(0, 4), (5, 50), (51, 95), (96, 100)]))
