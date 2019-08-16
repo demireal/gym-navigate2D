@@ -108,11 +108,11 @@ class navigate2DEnv(gym.Env):
             reinf = np.abs(self.x_index - 50) + np.abs(self.y_index - 45) + np.abs(self.x_tilt_index - 100) + np.abs(self.rot_index - 100)\
                     > np.abs(temp_x - 50) + np.abs(temp_y - 45) + np.abs(temp_x_tilt - 100) + np.abs(temp_rot - 100)
   
-            self.flag = 48 < temp_x < 52 and  43 < temp_y < 47 and 98 < temp_x_tilt < 102 and 98 < temp_rot < 102
+            self.flag = 48 < temp_x < 52 and  43 < temp_y < 47 and 97 < temp_x_tilt < 103 and 91 < temp_rot < 140
             self.done = self.flag and action == 0
             self.state = self.get_slice(temp_rot*2/(ROT_STATES - 1) - 1, temp_x_tilt*2/(X_TILT_STATES - 1) - 1, temp_x*2/(X_STATES - 1) - 1, temp_y*2/(Y_STATES - 1) - 1)
             obs = cv2.resize(self.state, dsize=(self.IN_DIM[1], self.IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]
-            reward = 0.1*(1 - self.done)*(-1 + 2*reinf) + self.done
+            reward = 0.1*(1 - self.done)*(-1 + 2*reinf)*(1 - 2*self.flag) + self.done
             if update == 1:
                 self.x_index = temp_x
                 self.y_index = temp_y
