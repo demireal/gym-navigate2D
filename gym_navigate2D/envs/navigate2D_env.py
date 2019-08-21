@@ -68,7 +68,7 @@ class navigate2DEnv(gym.Env):
         self.data = np.clip(self.data, 0, 255)
         self.data = np.array(self.data, np.uint8)
         
-        if np.random.rand(1)[0] > 0.05:
+        if np.random.rand(1)[0] > 0.1:
             self.x_index = randint(*choice([(0, 4), (5, 35), (36, 66), (67, 95), (96, 100)]))
             self.y_index = randint(*choice([(0, 4), (5, 32), (33, 60), (61, 85), (86, 90)]))
             self.x_tilt_index = randint(*choice([(0, 8), (9, 70), (71, 132), (133, 191), (192, 200)]))
