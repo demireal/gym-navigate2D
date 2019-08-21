@@ -68,17 +68,17 @@ class navigate2DEnv(gym.Env):
         self.data = np.clip(self.data, 0, 255)
         self.data = np.array(self.data, np.uint8)
         
-        if self.nbEpisode < 1000 and self.is_same == 0:
-            self.x_index = randint(0, X_STATES - 1)
-            self.y_index = randint(0, Y_STATES - 1)
-            self.x_tilt_index = randint(0, X_TILT_STATES - 1)
-            self.rot_index = randint(0, ROT_STATES - 1)
-        
+        if np.random.rand(1)[0] > 0.05:
+            self.x_index = randint(*choice([(0, 4), (5, 35), (36, 66), (67, 95), (96, 100)]))
+            self.y_index = randint(*choice([(0, 4), (5, 32), (33, 60), (61, 85), (86, 90)]))
+            self.x_tilt_index = randint(*choice([(0, 8), (9, 70), (71, 132), (133, 191), (192, 200)]))
+            self.rot_index = randint(*choice([(0, 8), (9, 70), (71, 132), (133, 191), (192, 200)]))
+            
         else:
-            self.x_index = randint(*choice([(0, 4), (5, 50), (51, 95), (96, 100)]))
-            self.y_index = randint(*choice([(0, 4), (5, 45), (46, 85), (86, 90)]))
-            self.x_tilt_index = randint(*choice([(0, 8), (9, 100), (101, 191), (192, 200)]))
-            self.rot_index = randint(*choice([(0, 8), (9, 100), (101, 191), (192, 200)]))
+            self.x_index = randint(48, 52)
+            self.y_index = randint(44, 46)
+            self.x_tilt_index = randint(96, 102)
+            self.rot_index = randint(97, 105)
 
         self.state = self.get_slice(self.rot_index*2/(ROT_STATES - 1) - 1, self.x_tilt_index*2/(X_TILT_STATES - 1) - 1, self.x_index*2/(X_STATES - 1) - 1, self.y_index*2/(Y_STATES - 1) - 1)
         state = cv2.resize(self.state, dsize=(self.IN_DIM[1], self.IN_DIM[2]), interpolation=INTERPOLATION)
@@ -110,11 +110,11 @@ class navigate2DEnv(gym.Env):
             
             # TODO: add different flags, redefine the reward to make transitions smoother
             
-            self.flag = 48 < temp_x < 52 and  43 < temp_y < 47 and 98 < temp_x_tilt < 103 and 96 < temp_rot < 106
+            self.flag = 47 < temp_x < 53 and  43 < temp_y < 47 and 95 < temp_x_tilt < 103 and 96 < temp_rot < 106
             self.done = self.flag and action == 0
             self.state = self.get_slice(temp_rot*2/(ROT_STATES - 1) - 1, temp_x_tilt*2/(X_TILT_STATES - 1) - 1, temp_x*2/(X_STATES - 1) - 1, temp_y*2/(Y_STATES - 1) - 1)
             obs = cv2.resize(self.state, dsize=(self.IN_DIM[1], self.IN_DIM[2]), interpolation=INTERPOLATION)[np.newaxis, :, :]
-            reward = 0.1*(1 - self.done)*(-1 + 2*reinf) + 10*self.done
+            reward = 0.1*(1 - self.done)*(-1 + 2*reinf) + self.done
             if update == 1:
                 self.x_index = temp_x
                 self.y_index = temp_y
